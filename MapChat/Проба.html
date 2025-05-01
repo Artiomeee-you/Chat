@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карточки с перелистыванием</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: sans-serif;
+        overflow: hidden;
+    }
+    .cards-container {
+        position: relative;
+        width: 100%;
+        height: calc(100% - 50px);
+    }
+    .card {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        transform: translateX(100%);
+        transition: transform 0.5s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3em;
+        background: lightgray;
+    }
+    .card.active {
+        transform: translateX(0);
+        z-index: 2;
+    }
+    .card.to-left {
+        transform: translateX(-100%);
+    }
+    .card.to-right {
+        transform: translateX(100%);
+    }
+    .tabs {
+        height: 50px;
+        display: flex;
+    }
+    .tab {
+        flex: 1;
+        padding: 10px;
+        text-align: center;
+        background: #333;
+        color: white;
+        cursor: pointer;
+        user-select: none;
+        line-height: 30px;
+    }
+    .tab.active {
+        background: #555;
+    }
+</style>
+</head>
+<body>
+
+<div class="cards-container">
+    <div class="card active" style="background:#FF9999;">Карточка 1</div>
+    <div class="card" style="background:#99CCFF;">Карточка 2</div>
+    <div class="card" style="background:#99FF99;">Карточка 3</div>
+    <div class="card" style="background:#FFCC99;">Карточка 4</div>
+    <div class="card" style="background:#CC99FF;">Карточка 5</div>
+</div>
+
+<div class="tabs">
+    <div class="tab active" data-index="0">1</div>
+    <div class="tab" data-index="1">2</div>
+    <div class="tab" data-index="2">3</div>
+    <div class="tab" data-index="3">4</div>
+    <div class="tab" data-index="4">5</div>
+</div>
+
+<script>
+    const cards = document.querySelectorAll('.card');
+    const tabs = document.querySelectorAll('.tab');
+    let currentIndex = 0;
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const newIndex = +tab.dataset.index;
+            if (newIndex === currentIndex) return;
+
+            const currentCard = cards[currentIndex];
+            const nextCard = cards[newIndex];
+            const direction = newIndex > currentIndex ? 'right' : 'left';
+
+            // Ставим следующую карточку снаружи
+            nextCard.classList.remove('to-left', 'to-right', 'active');
+            nextCard.style.zIndex = 3;
+            nextCard.classList.add(direction === 'right' ? 'to-right' : 'to-left');
+
+            // Позволяем браузеру применить стартовое положение
+            requestAnimationFrame(() => {
+                // Анимируем: активная уходит, новая заезжает
+                currentCard.classList.remove('active');
+                currentCard.classList.add(direction === 'right' ? 'to-left' : 'to-right');
+
+                nextCard.classList.remove('to-left', 'to-right');
+                nextCard.classList.add('active');
+
+                currentIndex = newIndex;
+
+                // Обновляем вкладки
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

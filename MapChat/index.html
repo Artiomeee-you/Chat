@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>MapChat — Запуск</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="welcome-screen">
+    <h2 class="welcome-title">Добро пожаловать в MapChat</h2>
+    <p class="welcome-subtitle">Нажми кнопку, чтобы начать</p>
+    <button id="startButton" class="big-button">Начать</button>
+  </div>
+
+  <script>
+    document.getElementById('startButton').addEventListener('click', () => {
+      window.location.href = 'home.html';
+    });
+  </script>
+</body>
+</html>

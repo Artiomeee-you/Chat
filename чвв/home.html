@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>MapChat — Главная</title>
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="style.css"/>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+
+  <style>
+    :root {
+      --primary:   #4f46e5;
+      --bg-light:  #fafafa;
+      --text-light:#333;
+      --bg-dark:   #2a2a3d;
+      --text-dark: #eee;
+    }
+    * { box-sizing: border-box; margin:0; padding:0 }
+    html, body {
+      width:100%; height:100%; overflow:hidden;
+      font-family:'Segoe UI',sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background .3s, color .3s;
+    }
+    body.dark-theme {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* контейнер трёх экранов: учитываем шапку сверху (60px) и панель снизу (60px) */
+    .screens {
+      position: absolute;
+      top: 60px;
+      bottom: 60px;
+      left: 0; right: 0;
+      display: flex;
+      width: 300vw;   /* 3 × 100vw */
+      height: auto;
+      transition: transform 0.3s ease;
+      overflow: hidden;
+    }
+    section.screen {
+      flex: 0 0 100vw;
+      
+      
+      background: var(--bg-light);
+    }
+    body.dark-theme section.screen {
+      background: var(--bg-dark);
+    }
+
+    /* заголовки */
+    .screen h2 {
+      margin: 0 0 16px;
+      font-size: 1.5rem;
+    }
+
+    /* стили для «Спец. возможности» */
+    .feature {
+      display: flex; justify-content: space-between; align-items: center;
+      padding:12px; margin-bottom:12px;
+      background:#f0f0ff; border-radius:8px;
+    }
+    .badge {
+      background: var(--primary); color:#fff;
+      padding:4px 8px; border-radius:12px;
+      font-size:.85rem;
+    }
+    .toggle {
+      display:flex; background:#ddd;
+      border-radius:8px; overflow:hidden;
+    }
+    .toggle-btn {
+      flex:1; padding:8px; border:none; background:none;
+      cursor:pointer; color:#333;
+      transition:background .2s, color .2s;
+    }
+    .toggle-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    body.dark-theme .feature { background:#3a3a50 }
+    body.dark-theme .toggle { background:#444 }
+    body.dark-theme .toggle-btn { color:#eee }
+
+    /* цветовые акценты */
+    .color-options { display:flex; gap:8px; margin-top:8px }
+    .color-square {
+      width:24px; height:24px; border-radius:4px;
+      cursor:pointer; border:2px solid transparent;
+      transition: border-color .2s;
+    }
+    .color-square.selected {
+      border-color:#000;
+    }
+    .light-green  { background:#6ee7b7 }
+    .dark-green   { background:#047857 }
+    .light-blue   { background:#93c5fd }
+    .dark-blue    { background:#1e3a8a }
+    .light-purple { background:#d8b4fe }
+    .dark-purple  { background:#5b21b6 }
+
+    /* карта */
+    .map-container {
+      width:100%;
+      /* высота = 100vh − навигация (60px) − padding сверху/снизу (48px) */
+      height: calc(100vh - 60px - 48px);
+      position: relative;
+    }
+    .overlay {
+      position:absolute; inset:0;
+      display:flex; justify-content:center; align-items:center;
+      z-index:2;
+    }
+    .overlay button {
+      padding:14px 28px; font-size:1.1rem;
+      border:none; border-radius:24px;
+      background:var(--primary); color:#fff;
+      box-shadow:0 4px 12px rgba(0,0,0,.2);
+      cursor:pointer;
+      transition:background .2s;
+    }
+
+    /* профиль */
+    #profile select,
+    #profile input,
+    #profile textarea {
+      width:100%; margin-bottom:12px; padding:10px;
+      border:1px solid #ddd; border-radius:8px;
+      font-size:1rem;
+    }
+    body.dark-theme #profile select,
+    body.dark-theme #profile input,
+    body.dark-theme #profile textarea {
+      background:#3a3a50; border-color:#555; color:#eee;
+    }
+    #saveProfile {
+      display:block; width:100%; padding:12px;
+      border:none; border-radius:8px;
+      background:var(--primary); color:#fff;
+      font-size:1rem; cursor:pointer;
+      transition:background .2s, opacity .2s;
+    }
+    #saveProfile:disabled {
+      opacity:.6; cursor:not-allowed;
+    }
+
+    .nav-buttons {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%; height: 60px;
+      display: flex;
+      background: var(--bg-light);
+      border-top: 1px solid #ddd;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+      z-index: 1001;
+    }
+    .nav-buttons button {
+      flex: 1;
+      border: none;
+      background: none;
+      font-size: 1rem;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: background .2s, color .2s;
+      pointer-events: auto;
+    }
+    body.dark-theme .nav-buttons {
+      background: var(--bg-dark);
+      border-top-color: #444;
+    }
+    body.dark-theme .nav-buttons button {
+      color: var(--text-dark);
+    }
+    .nav-buttons button.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-buttons button:hover:not(.active) {
+      background: rgba(0,0,0,0.05);
+    }
+    body.dark-theme .nav-buttons button:hover:not(.active) {
+      background: rgba(255,255,255,0.05);
+    }
+
+    #toggleThemePanel.btn-update {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+#features .profile-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+/* сама карточка поиска */
+#features .chat-search {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* тёмная тема */
+body.dark-theme #features .chat-search {
+  background: #2a2a3d;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* поля возраста */
+#features .chat-search input[type="text"] {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color .2s;
+}
+body.dark-theme #features .chat-search input[type="text"] {
+  background: #3a3a50;
+  border-color: #555;
+  color: #eee;
+}
+
+/* кнопка поиска */
+#searchButton {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .2s;
+}
+#searchButton:hover {
+  background: #4338ca;
+}
+
+/* группа кнопок «Случайный», «М»/«Ж» */
+#features .search-gender {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#features .search-gender .large {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color .2s, background .2s;
+}
+#features .search-gender-btn {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  flex: 1;
+  font-size: .95rem;
+  transition: border-color .2s, background .2s;
+}
+#features .search-gender-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+#features .small-genders {
+  display: flex;
+  gap: 8px;
+}
+
+/* тёмная тема для кнопок */
+body.dark-theme #features .search-gender-btn {
+  background: #3a3a50;
+  border-color: #555;
+  color: #eee;
+}
+body.dark-theme #features .search-gender-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+/* статус ожидания */
+#searchStatus {
+  font-size: .9rem;
+  color: var(--text-light);
+  text-align: center;
+  min-height: 1.2em;
+}
+body.dark-theme #searchStatus {
+  color: var(--text-dark);
+}
+/* «Поднимаем» оверлей над header/nav и сдвигаем его под шапку и над футером */
+
+
+/* обёртка окна чата */
+
+/* небольшой отступ между header чата и списком сообщений */
+.chat-overlay .chat-header {
+  padding: 12px;
+}
+
+.chat-overlay {
+  position: fixed;
+  top: 60px;
+  bottom: 60px;
+  left: 0; right: 0;
+  display: none;         /* скрыт по умолчанию */
+  z-index: 1001;
+  background: rgba(255,255,255,0.9);
+  flex-direction: column;
+}
+
+
+/* Контейнер самого окна чата */
+.chat-overlay .chat-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  margin: 0;            /* убираем центрирование */
+  width: 100%;          /* 100% ширины оверлея */
+  max-width: none;      /* снимаем ограничение */
+  border-radius: 0;     /* по желанию, чтобы края совпали с оверлеем */
+  overflow: hidden;
+}
+
+
+/* Полю ввода гарантируем видимость */
+.chat-overlay .chat-input {
+  flex-shrink: 0;          /* не сжимается */
+}
+
+/* Метки над полем поиска */
+.search-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+/* Блок для двух инпутов возраста */
+.age-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Разделитель между мин и макс */
+.age-sep {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+
+/* контейнер и фон «трек» */
+.age-range-slider {
+  position: relative;
+  height: 6px;
+  margin: 8px 0 16px;
+}
+.age-range-slider .slider-track {
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 4px;
+  background: #ddd;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  /* фон выбранного диапазона будем задавать через JS */
+}
+
+/* сами ползунки */
+.age-range-slider input[type="range"] {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 6px;
+  background: none;
+  pointer-events: none; /* делают всю полосу кликабельной, но перехват событий потом */
+  -webkit-appearance: none;
+}
+.age-range-slider input[type="range"]::-webkit-slider-thumb {
+  pointer-events: all; /* только «ползунок» перехватывает клики */
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid #fff;
+  box-shadow: 0 0 2px rgba(0,0,0,0.3);
+  cursor: pointer;
+}
+
+  </style>
+</head>
+<body>
+    <!-- шапка (опционально) -->
+    <div id="header"></div>
+  
+    <!-- контейнер экранов -->
+    <div class="screens" id="screens">
+
+      <!-- 0: Возможности -->
+      <section class="screen" id="features">
+        <div class="profile-wrapper">
+          <div class="chat-search">
+      
+            <!-- Метка для пола -->
+            <label class="search-label" for="genderFilter">Пол собеседника</label>
+            <div class="search-gender">
+              <button type="button" id="genderRandom" class="search-gender-btn large active">
+                Случайный
+              </button>
+              <div class="small-genders">
+                <button type="button" id="genderMale" class="search-gender-btn" data-gender="male">
+                  Мужской
+                </button>
+                <button type="button" id="genderFemale" class="search-gender-btn" data-gender="female">
+                  Женский
+                </button>
+              </div>
+              <input type="hidden" id="genderFilter" value="">
+            </div>
+            <div id="waitingOverlay" class="waiting-overlay hidden">
+              <div class="waiting-pulse"></div>
+            </div>
+            <!-- Метка для возраста -->
+            <label class="search-label" for="minAge">Возраст собеседника</label>
+            <div class="age-inputs">
+              <input type="text" id="minAge" placeholder="мин" size="4">
+              <span class="age-sep">—</span>
+              <input type="text" id="maxAge" placeholder="макс" size="4">
+            </div>
+
+            <div class="age-range-slider">
+              <div class="slider-track"></div>
+              <input type="range" id="minAgeRange" min="18" max="100" value="18">
+              <input type="range" id="maxAgeRange" min="18" max="100" value="100">
+            </div>
+      
+            <button id="searchButton">Найти собеседника</button>
+            
+            <div id="searchStatus"></div>
+            
+            <div id="inlineSpinner" class="inline-spinner hidden"></div>
+          </div>
+          
+        </div>
+      </section>
+      
+    
+      <!-- 1: Профиль -->
+      <section class="screen" id="profile">
+        <div id="profile-view">
+          
+          <div class="profile-wrapper">
+            
+            <div class="profile-card variant-1 gender-male" id="profileCard">
+              <div class="avatar">
+                <img id="profilePhoto"  alt="">
+
+              </div>
+
+              
+              <div class="info">
+                <button id="toggleThemePanel" class="btn-update" style="width: 100%; margin-bottom: 12px;">
+                  Дизайн
+                </button>
+                <div id="themePanel" class="collapsed">
+                  <div class="feature">
+                    <div class="toggle">
+                      <button id="lightMode" class="toggle-btn active">Светлая</button>
+                      <button id="darkMode" class="toggle-btn">Тёмная</button>
+                    </div>
+                  </div>
+                  
+                  <div class="feature">
+                    <div class="color-options">
+                      <div class="color-square light-green selected" data-color="#6ee7b7"></div>
+                      <div class="color-square dark-green" data-color="#047857"></div>
+                      <div class="color-square light-blue" data-color="#93c5fd"></div>
+                      <div class="color-square dark-blue" data-color="#1e3a8a"></div>
+                      <div class="color-square light-purple" data-color="#d8b4fe"></div>
+                      <div class="color-square dark-purple" data-color="#5b21b6"></div>
+                    </div>
+                  </div>
+                  
+                </div>
+             
+                <div style="display: flex; gap: 8px;">
+                  <input id="photoInput" type="file" accept="image/*" style="display:none;" />
+                  <button class="btn-update" id="uploadPhotoButton" style="flex: 1;">Добавить фото</button>
+                  <button class="btn-delete" id="deletePhotoButton" style="flex: 0;">✖</button>
+                </div>
+                <!-- контейнер переключателей пола -->
+<div class="gender-buttons" id="genderButtons">
+  <button type="button" class="gender-btn" data-gender="male">Мужской</button>
+  <button type="button" class="gender-btn" data-gender="female">Женский</button>
+</div>
+<!-- скрытое поле для формы, если нужно -->
+<input type="hidden" id="gender" value="">
+
+
+                
+                <input id="username" type="text" placeholder="Имя"/>
+                <input id="age" type="number" placeholder="Возраст"/>
+               
+                <textarea id="message" placeholder="Что Вы хотите сказать миру..."></textarea>
+                <button class="btn-update" id="saveProfile">Обновить</button>
+              </div>
+            </div>
+            
+            
+            
+            
+         
+          </div>
+          
+        </div>
+        <div id="incoming"></div>
+        <div id="chat"></div>
+
+        <div id="blockedPanel" class="slide-panel">
+          <h3>Заблокированные пользователи</h3>
+          <ul id="blockedList"></ul>
+          <button id="closeBlocked">Закрыть</button>
+        </div>
+      </section>
+    
+      <!-- 2: Карта -->
+      <section class="screen" id="welcome">
+        <div class="map-container">
+          <div id="map"></div>
+          
+          
+        </div>
+      </section>
+    
+    </div>
+
+    <div id="chatOverlay" class="chat-overlay"></div>
+    
+    <!-- Навигация -->
+    <nav class="nav-buttons">
+      <button id="btnFeatures" data-index="0" >Быстрый чат</button>
+      <button id="btnProfile" data-index="1"class="active">Профиль</button>
+      <button id="btnMap" data-index="2">Карта</button>
+    </nav>
+    
+  
+    <div id="footer"></div>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <!-- Основная логика -->
+  <script type="module" src="/js/home.js"></script>
+  
+  
+</body>
+</html>
+  

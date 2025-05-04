@@ -1,0 +1,1103 @@
+
+/* ляляляляляяляляляялялялял*/
+.profile-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 16px;
+}
+
+/* Поле выбора пола */
+.gender-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gender-field label {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+.gender-field select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Карточка профиля (вариант 1) */
+.profile-card {
+  width: 240px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  position: relative;
+  font-family: Arial, sans-serif;
+}
+
+/* Аватар */
+.profile-card .avatar {
+  width: 100%;
+  padding-bottom: 100%; /* квадрат */
+  position: relative;
+  background: #eee;
+}
+.profile-card .avatar img {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 80%; height: 80%;
+  object-fit: cover;
+  border-radius: 50%;
+  transform: translate(-50%,-50%);
+  border: 4px solid var(--primary);
+}
+
+/* Текстовая информация */
+.profile-card .info {
+  padding: 12px;
+  text-align: center;
+}
+.profile-card .info .name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+.profile-card .info .details {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.profile-card .info .status {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+/* Кнопка */
+.btn-update {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.btn-photo {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .2s;
+} 
+
+
+
+/* Гендерные цвета */
+.gender-male .avatar img,
+.gender-male .btn-update {
+  border-color: #3b82f6;
+  background: #3b82f6;
+}
+.gender-female .avatar img,
+.gender-female .btn-update {
+  border-color: #ec4899;
+  background: #ec4899;
+}
+
+.chat-input .emoji-btn {
+  align-self: center;
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
+  /* остальные ваши стили… */
+}
+.map-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 400; /* ниже, чем z-index чата (500), но выше плитки карты */
+}
+/* чуть подправим внешний вид кнопок */
+.map-controls .leaflet-control-zoom-in,
+.map-controls .leaflet-control-zoom-out {
+  width: 32px; height: 32px;
+  line-height: 32px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #333;
+  cursor: pointer;
+}
+/* чекбокс “Показывать меня” */
+.show-me-control {
+  background: rgba(255,255,255,0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #333;
+}
+/* в секции .screens */
+.screens {
+    display: flex;
+    width: 300vw;   /* 3 экрана по 100vw */
+    height: 100vh;
+    transition: transform 0.3s ease;
+    overflow: hidden;    /* ← запретить прокрутку */
+  }
+  
+  /* у карты убрать фокусный outline */
+  .map-container:focus {
+    outline: none;
+  }
+  
+/* Поместить в ваш style.css или внутрь <style> */
+
+/* 1. Сделать header фиксированным и по центру */
+#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;               /* подберите нужную высоту */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-dark); /* или любой цвет фона */
+    color: #fff;                /* цвет текста */
+    font-size: 1.25rem;
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: background .3s, color .3s;
+  }
+  
+  /* 2. В светлой теме — светлый фон и тёмный текст */
+  body:not(.dark-theme) #header {
+    background: var(--bg-light);
+    color: var(--text-light);
+  }
+  
+  /* 3. Отступ сверху для контента, чтобы не скрывался под header */
+  body {
+    padding-top: 60px; /* должен совпадать с height у #header */
+  }
+  
+  /* 4. Уменьшаем высоту .screens, чтобы не было вертикальной прокрутки под header */
+  .screens {
+    margin-top: 0; /* margin уже учтён через body padding */
+    height: calc(100vh - 60px); /* общая высота минус header */
+  }
+
+  
+:root {
+    --primary:   #4f46e5;    /* основной акцент */
+    --bg-light:  #fafafa;    /* фон светлой темы */
+    --text-light:#333;       /* текст в светлой теме */
+    --bg-dark:   #2a2a3d;    /* фон тёмной темы */
+    --text-dark: #eee;       /* текст в тёмной теме */
+  }
+  
+  /* Оставляем место под панель */
+  body {
+    padding-bottom: 60px;  /* высота панели */
+  }
+  
+  /* Сама панель */
+  .nav-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    background: var(--bg-light);
+    border-top: 1px solid #e0e0e0;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transition: background .3s, border-color .3s, box-shadow .3s;
+  }
+  
+  /* Тёмная тема */
+  body.dark-theme .nav-buttons {
+    background: var(--bg-dark);
+    border-top-color: #444;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+  }
+  
+  /* Кнопки */
+  .nav-buttons button {
+    flex: 1;
+    border: none;
+    background: none;
+    font-size: 1rem;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: background .2s, color .2s;
+  }
+  
+  /* Цвета в тёмной теме */
+  body.dark-theme .nav-buttons button {
+    color: var(--text-dark);
+  }
+  
+  /* Активная кнопка */
+  .nav-buttons button.active {
+    background: var(--primary);
+    color: #fff;
+  }
+  
+  /* Hover для неактивных */
+  .nav-buttons button:hover:not(.active) {
+    background: rgba(0,0,0,0.05);
+  }
+  body.dark-theme .nav-buttons button:hover:not(.active) {
+    background: rgba(255,255,255,0.05);
+  }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    color: #333;
+  }
+  .screen h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 1.5rem;
+  }
+  .feature {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #f0f0ff;
+    border-radius: 8px;
+  }
+  .badge {
+    background: var(--primary);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: .85rem;
+  }
+  .toggle {
+    display: flex;
+    background: #ddd;
+    border-radius: 8px;
+  }
+  .toggle-btn {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #333;
+  }
+  .toggle-btn.active {
+    background: var(--primary);
+    color: #fff;
+  }
+  .color-options {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .color-square {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  .color-square.selected {
+    border-color: #000;
+  }
+  .light-green  { background: #6ee7b7; }
+  .dark-green   { background: #047857; }
+  .light-blue   { background: #93c5fd; }
+  .dark-blue    { background: #1e3a8a; }
+  .light-purple { background: #d8b4fe; }
+  .dark-purple  { background: #5b21b6; }
+  
+  /* карта */
+  .map-container { position: relative; }
+  #map { width: 100%; height: 100%; }
+  
+  /* профиль */
+  #profile select,
+  #profile input,
+  #profile textarea {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  #saveProfile {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  #saveProfile:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .nav-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    z-index: 100;   /* достаточно высокий, чтобы быть над .screens */
+  }
+  /* тёмная тема */
+  body.dark-theme {
+    background: #1e1e2a;
+    color: #eee;
+  }
+  body.dark-theme .feature {
+    background: #3a3a50;
+  }
+  body.dark-theme .toggle {
+    background: #444;
+  }
+  body.dark-theme .toggle-btn {
+    color: #eee;
+  }
+
+  .screen {
+    position: relative;
+  }
+
+  #header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 1000;
+  }
+  
+  /* теперь контейнер экранов задаём не через height:100vh, а через top/bottom */
+  .screens {
+    position: absolute;
+    top: 60px;    /* сразу под шапкой */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+    /* скроллим только внутри экранов, а не всей страницы */
+    overflow: hidden;
+  }
+  .nav-buttons {
+    z-index: 1000;
+  }
+  
+  /* overlay covers entire section, but ignores clicks */
+  .overlay {
+    pointer-events: none;
+  }
+  
+  /* only the button inside overlay still receives clicks */
+  .overlay button {
+    pointer-events: auto;
+  }
+
+  .chat-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;           /* по умолчанию скрыт */
+    z-index: 500;            /* над картой, но под меню */
+    flex-direction: column;
+    background: rgba(255,255,255,0.9);
+    padding: 16px;
+  }
+
+  .chat-overlay .chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #fff;
+    border-bottom: 1px solid #ccc;
+    font-weight: bold;
+  }
+  
+  .chat-overlay .chat-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background .2s;
+  }
+  .chat-overlay .chat-header button:hover {
+    background: rgba(0,0,0,0.05);
+  }
+  
+  /* контейнер сообщений */
+  .chat-overlay #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    background: #f9f9f9;
+  }
+  
+  /* поле ввода + кнопка */
+  .chat-overlay .chat-input {
+    display: flex;
+    align-items: center; 
+    border-top: 1px solid #ccc;
+    padding: 8px;
+    background: #fff;
+  }
+  .chat-overlay .chat-input input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+  }
+  .chat-overlay .chat-input button {
+    margin-left: 8px;
+    padding: 8px 12px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  /* стили для пузырей сообщений */
+.chat-overlay .message {
+    max-width: 70%;
+    margin: 4px;
+    padding: 8px;
+    border-radius: 12px;
+    clear: both;
+    word-wrap: break-word;
+  }
+  .chat-overlay .message.me {
+    
+    background: var(--primary);
+    color: #fff;
+    float: right;
+    text-align: left;
+  }
+  .chat-overlay .message.peer {
+    background: var(--primary);
+    color: #fff;
+    float: left;
+    text-align: left;
+    padding-left: 8px;
+  }
+  
+
+  /* 1) Pin the header */
+#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;              /* match whatever height your <header> actually is */
+    z-index: 1000;             /* sit above everything else */
+  }
+  
+  /* 2) Push the body content down so it doesn’t hide under the header */
+  body {
+    padding-top: 60px;         /* same 60px as your header height */
+    padding-bottom: 60px;      /* see footer below */
+  }
+  
+  /* 3) Pin the nav-buttons (footer) */
+  .nav-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;              /* same as your header, but at bottom */
+    z-index: 1000;             /* above the .screens panels */
+  }
+  
+  /* 4) Constrain your “three-screen” container to the space between header & footer */
+  .screens {
+    position: absolute;        /* instead of height:100vh */
+    top:    60px;              /* push it below the fixed header */
+    bottom: 60px;              /* leave room above the fixed footer */
+    left:   0;
+    right:  0;
+    display: flex;
+    overflow: hidden;          /* no double-scrollbars */ 
+    transition: transform 0.3s ease;
+  }
+
+/* выдвигающаяся панель */
+.slide-panel {
+    position: fixed;
+    top: 60px;          /* высота header */
+    bottom: 60px;       /* высота footer */
+    right: 0;
+    width: 250px;
+    background: var(--bg-light);
+    box-shadow: -2px 0 6px rgba(0,0,0,0.2);
+    transform: translateX(100%);
+    transition: transform .3s ease;
+    z-index: 1002;
+    padding: 16px;
+    overflow-y: auto;
+  }
+  body.dark-theme .slide-panel {
+    background: var(--bg-dark);
+    color: var(--text-dark);
+  }
+  
+  /* открытое состояние */
+  .slide-panel.open {
+    transform: translateX(0);
+  }
+  
+  /* «Закрыть» */
+  #closeBlocked {
+    margin-top: 16px;
+    width: 100%;
+    padding: 8px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  /* внутри .slide-panel ul */
+.slide-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .slide-panel .blocked-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .slide-panel .blocked-time {
+    font-size: .75rem;
+    color: #666;
+    margin-left: 8px;
+  }
+  .slide-panel .unblock-btn {
+    margin-left: 8px;
+    padding: 4px 8px;
+    border: none;
+    background: #e53e3e;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .request-btn,
+  .accept-btn,
+  .decline-btn,
+  #exitChat,
+  #blockChat {
+  cursor: pointer;
+}
+.leaflet-tooltip.user-tooltip {
+    background: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    font-size: 0.9rem;
+    pointer-events: none; /* чтобы клики шли «сквозь» лейбл */
+  }
+
+  /* контейнер вокруг ползунка */
+
+  
+  /* сам ползунок */
+  .zoom-slider {
+    width: 100px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    background: transparent;
+  }
+  
+  /* стили ползунка для WebKit */
+  .zoom-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+  }
+  .zoom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-top: -4px;
+  }
+  
+  /* стили ползунка для Firefox */
+  .zoom-slider::-moz-range-track {
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+  }
+  .zoom-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    border: none;
+  }
+
+  /* контейнер кастомного зума (колонка) */
+
+  
+  /* сам ползунок: задаём длину и поворачиваем */
+  .zoom-slider-vert {
+    /* делаем его горизонтальным и потом поворачиваем */
+    width: 100px;               /* длина “головы” ползунка */
+    transform: rotate(270deg);  /* 270° — чтобы нарастал вверх */
+    transform-origin: center;
+    margin: 4px 0;
+    -webkit-appearance: none;
+    background: transparent;
+  }
+  
+  /* дорожка */
+  .zoom-slider-vert::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+  }
+  .zoom-slider-vert::-moz-range-track {
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+  }
+  
+  /* “ползунок” */
+  .zoom-slider-vert::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-top: -4px;
+    cursor: pointer;
+  }
+  .zoom-slider-vert::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+  }
+  /* контейнер кастомного зума (колонка) */
+.custom-zoom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* сам вертикальный ползунок */
+  .zoom-slider-vert {
+    width: 100px;              /* длина ползунка перед поворотом */
+    transform: rotate(270deg); /* чтобы бегунок “растил” вверх */
+    transform-origin: center;
+    margin: 4px 0;
+    -webkit-appearance: none;
+    background: transparent;
+  }
+  
+  /* дорожка ползунка */
+  .zoom-slider-vert::-webkit-slider-runnable-track,
+  .zoom-slider-vert::-moz-range-track {
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+  }
+  
+  /* сам “ползунок” */
+  .zoom-slider-vert::-webkit-slider-thumb,
+  .zoom-slider-vert::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  /* заставляем блок .user-photo быть кругом */
+  .user-photo {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+    box-sizing: border-box;
+  }
+  /* Убираем фон и границу у контейнера divIcon */
+.user-photo-marker {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Дочерний .user-photo остаётся кругом */
+  .user-photo-marker .user-photo {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+    box-sizing: border-box;
+  }
+  .leaflet-div-icon {
+    background: none !important;
+    border: none     !important;
+    box-shadow: none !important;
+  }
+  /* контейнер для “Показывать меня” */
+.leaflet-control.show-me-control {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  
+  /* сам чекбокс */
+  .show-me-control input {
+    margin: 0 4px 0 0;
+  }
+/* style.css */
+/* style.css */
+
+/* 1) Кнопка должна обрезать всё, что выходит за её края */
+.nav-buttons button.attention {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 2) Псевдоэлемент-кольцо внутри кнопки */
+.nav-buttons button.beacon-flash {
+  animation: beacon-flash 1s ease-in-out infinite;
+}
+
+@keyframes beacon-flash {
+  0%, 100% { background: var(--primary); }
+  50%      { background: #3b82f6; } /* светло-голубой акцент */
+}
+
+:root {
+  /* существующие переменные */
+  --primary:   #6ee7b7;   /* например, зелёный акцент */
+  --bg-light:  #fafafa;   /* фон светлой темы */
+  --text-light:#333;      /* текст светлой темы */
+  --bg-dark:   #2a2a3d;   /* фон тёмной темы */
+  --text-dark: #eee;      /* текст тёмной темы */
+
+  /* новые для флеша */
+  --flash-start-light: #ffffff;  /* белый для светлой */
+  --flash-start-dark:  #000000;  /* чёрный для тёмной */
+}
+
+/* сам класс мигалки */
+.nav-buttons button.beacon-flash {
+  --flash-start: var(--flash-start-light); /* обычно белый */
+  --flash-end:   var(--primary);           /* ваш акцент */
+  animation: beacon-flash 1s ease-in-out infinite alternate;
+}
+body.dark-theme .nav-buttons button.beacon-flash {
+  --flash-start: var(--bg-dark);  /* вместо чёрного */
+  /* --flash-end остаётся var(--primary) */
+}
+
+/* end-color всегда ваш акцент */
+.nav-buttons button.beacon-flash {
+  --flash-end: var(--primary);
+  animation: beacon-flash 1s ease-in-out infinite alternate;
+}
+
+@keyframes beacon-flash {
+  from { background: var(--flash-start); }
+  to   { background: var(--flash-end); }
+}
+
+/* в style.css */
+.map-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 400; /* ниже, чем у chatOverlay (у него по умолчанию 500) */
+}
+
+/* понижаем чекбокс «Показывать меня» под чат */
+.leaflet-control.show-me-control {
+  z-index: 400 !important;    /* любое значение < 500 */
+}
+
+/* гарантируем, что оверлей чата выше */
+#chatOverlay {
+  z-index: 500 !important;
+}
+/* кнопка-эмоджи */
+.emoji-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 4px;
+}
+
+/* панелька выбора смайлов */
+.emoji-picker {
+  
+  position: absolute;
+  bottom: 48px;        /* чуть над полем ввода */
+  left: 10px;          /* под кнопкой эмоджи */
+  display: none;       /* по умолчанию скрыта */
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 600;
+}
+
+/* сам смайлик внутри панели */
+.emoji-picker span {
+  font-size: 20px;
+  cursor: pointer;
+  margin: 2px;
+  display: inline-block;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+/* Обёртка поля ввода */
+.chat-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 8px 8px 8px 48px; /* слева оставим место под кнопку эмоджи */
+  background: #fff;
+  border-top: 1px solid #ccc;
+}
+
+/* Кнопка-эмоджи */
+.emoji-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+/* Панель выбора эмоджи */
+.emoji-picker {
+  position: absolute;
+  bottom: 48px;    /* чуть над полем ввода */
+  left: 8px;       /* под кнопкой */
+  display: none;   /* по умолчанию скрыта */
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 600;
+}
+
+/* Смайлики внутри панели */
+.emoji-picker span {
+  font-size: 20px;
+  cursor: pointer;
+  margin: 2px;
+  display: inline-block;
+}
+
+   /* Обёртка для центровки */
+   .profile-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 16px;
+  }
+
+  /* Пол выбора пола */
+  .gender-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .gender-field label {
+    font-size: 0.9rem;
+    color: var(--text-light);
+  }
+  .gender-field select {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+  /* Квадратная карточка профиля */
+  .profile-card {
+    width: 240px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  .profile-card .avatar {
+    width: 100%;
+    padding-bottom: 100%;
+    position: relative;
+    background: #eee;
+  }
+  .profile-card .avatar img {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 80%; height: 80%;
+    object-fit: cover;
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+    border: 4px solid var(--primary);
+  }
+
+  .profile-card .info {
+    padding: 12px;
+  }
+  .profile-card .info .name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-light);
+    margin-bottom: 4px;
+  }
+  .profile-card .info .details {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .profile-card .info .status {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--text-secondary);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  /* Кнопка обновления */
+  .btn-update {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    color: #fff;
+    background: var(--primary);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-update:hover {
+    filter: brightness(0.9);
+  }
+
+  /* Гендерные цвета */
+  .gender-male  .avatar img,
+  .gender-male  .btn-update { border-color: #3b82f6; background: #3b82f6; }
+  .gender-female .avatar img,
+  .gender-female .btn-update { border-color: #ec4899; background: #ec4899; }
+/* Скрыть стандартный input[type=file] */
+.photo-feature input[type="file"] {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  border: 0;
+}
+
+/* Стили для кнопки-лейбла */
+.btn-photo {
+  display: inline-block;
+  padding: 8px 16px;
+  margin-left: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #fff;
+  background: var(--primary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  user-select: none;
+}
+
+.btn-photo:active {
+  transform: scale(0.97);
+}
+
+
+#uploadPhotoButton {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background .2s, opacity .2s;
+}
+
+#uploadPhotoButton:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}

@@ -153,15 +153,7 @@
 }
 
 /* Карточка профиля (вариант 1) */
-.profile-card {
-  width: 240px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
-  position: relative;
-  font-family: Arial, sans-serif;
-}
+
 
 /* Аватар */
 .profile-card .avatar {
@@ -1112,6 +1104,8 @@ body.dark-theme .nav-buttons button.beacon-flash {
 
   /* Квадратная карточка профиля */
   .profile-card {
+    display: flex;
+  flex-direction: column;
     width: 240px;
     background: #fff;
     border-radius: 12px;
@@ -1136,9 +1130,6 @@ body.dark-theme .nav-buttons button.beacon-flash {
     border: 4px solid var(--primary);
   }
 
-  .profile-card .info {
-    padding: 12px;
-  }
   .profile-card .info .name {
     font-size: 1.1rem;
     font-weight: bold;
@@ -1363,4 +1354,11 @@ body.dark-theme .nav-buttons button.beacon-flash {
   margin-top: 2px;
   font-size: 11px;
   color: #555;
+}
+#profile-view {
+  height: 100%;               /* заполнить по высоте секции */
+  overflow-y: auto;           /* включить прокрутку при переполнении */
+  -webkit-overflow-scrolling: touch; /* плавный «инерционный» скролл на iOS */
+  padding-bottom: 16px;       /* отступ снизу, чтобы кнопка не прилипала */
+  box-sizing: border-box;     /* чтобы padding не вылезал за границы */
 }

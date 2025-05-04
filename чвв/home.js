@@ -363,7 +363,7 @@ function setupRequestListener() {
 
   onChildAdded(requestsRef, snap => {
     const fromId = snap.key, req = snap.val();
-    if (req.status==='pending' && !shown[fromId] && !declined[fromId]) {
+    if (req.status==='pending') {
       shown[fromId] = true;
       showIncomingRequest(fromId);
       btnMap.classList.add('beacon-flash');
@@ -1022,13 +1022,18 @@ markers[id].bindTooltip(labelHtml, {
   });
 
   
-  onChildAdded(requestsRef, snap => {
-    const fromId = snap.key, req = snap.val();
-    if (req.status === 'pending' && !shown[fromId]) {
-      showIncomingRequest(fromId);
-      shown[fromId] = true;
+ // Вместо onChildAdded — один раз и при любых изменениях
+onValue(requestsRef, snap => {
+  const pendingIds = [];
+  snap.forEach(child => {
+    const req = child.val();
+    if (req.status === 'pending') {
+      pendingIds.push(child.key);
     }
   });
+  showAllIncomingRequests(pendingIds);
+});
+
 
   // после инициализации db и deviceId
 
@@ -1391,7 +1396,7 @@ function acceptRequest(fromId) {
 function declineRequest(fromId) {
   // сначала сразу убираем попап в UI
   closeAndRebind(fromId);
-  clearBeacon();
+
 
   // потом удаляем запрос из БД
   set(ref(db, `requests/${deviceId}/${fromId}`), null)

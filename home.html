@@ -405,6 +405,7 @@ body.dark-theme #searchStatus {
   </style>
 </head>
 <body>
+  <div id="requestList" class="request-list"></div>
     <!-- шапка (опционально) -->
     <div id="header"></div>
   
@@ -445,8 +446,8 @@ body.dark-theme #searchStatus {
 
             <div class="age-range-slider">
               <div class="slider-track"></div>
-              <input type="range" id="minAgeRange" min="18" max="100" value="18">
-              <input type="range" id="maxAgeRange" min="18" max="100" value="100">
+              <input type="range" id="minAgeRange" min="12" max="100" value="12">
+              <input type="range" id="maxAgeRange" min="12" max="100" value="100">
             </div>
       
             <button id="searchButton">Найти собеседника</button>
@@ -563,7 +564,7 @@ body.dark-theme #searchStatus {
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <!-- Основная логика -->
-  <script type="module" src="/js/home.js"></script>
+  <script type="module" src="home.js"></script>
   
   
 </body>

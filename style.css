@@ -153,15 +153,7 @@
 }
 
 /* Карточка профиля (вариант 1) */
-.profile-card {
-  width: 240px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
-  position: relative;
-  font-family: Arial, sans-serif;
-}
+
 
 /* Аватар */
 .profile-card .avatar {
@@ -259,18 +251,7 @@
 }
 /* чуть подправим внешний вид кнопок */
 .map-controls .leaflet-control-zoom-in,
-.map-controls .leaflet-control-zoom-out {
-  width: 32px; height: 32px;
-  line-height: 32px;
-  text-align: center;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  text-decoration: none;
-  font-size: 18px;
-  color: #333;
-  cursor: pointer;
-}
+
 /* чекбокс “Показывать меня” */
 .show-me-control {
   background: rgba(255,255,255,0.8);
@@ -569,7 +550,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
+    padding: 20px 12px;
     background: #fff;
     border-bottom: 1px solid #ccc;
     font-weight: bold;
@@ -593,7 +574,7 @@ body {
   .chat-overlay #messages {
     flex: 1;
     overflow-y: auto;
-    padding: 8px;
+    padding: 20px;
     background: #f9f9f9;
   }
   
@@ -602,19 +583,19 @@ body {
     display: flex;
     align-items: center; 
     border-top: 1px solid #ccc;
-    padding: 8px;
+    padding: 5px;
     background: #fff;
   }
   .chat-overlay .chat-input input {
     flex: 1;
-    padding: 8px;
+    padding: 20px;
     border: 1px solid #ccc;
     border-radius: 4px;
     outline: none;
   }
   .chat-overlay .chat-input button {
     margin-left: 8px;
-    padding: 8px 12px;
+    padding: 20px 30px;
     border: none;
     background: var(--primary);
     color: #fff;
@@ -1112,6 +1093,8 @@ body.dark-theme .nav-buttons button.beacon-flash {
 
   /* Квадратная карточка профиля */
   .profile-card {
+    display: flex;
+  flex-direction: column;
     width: 240px;
     background: #fff;
     border-radius: 12px;
@@ -1136,9 +1119,6 @@ body.dark-theme .nav-buttons button.beacon-flash {
     border: 4px solid var(--primary);
   }
 
-  .profile-card .info {
-    padding: 12px;
-  }
   .profile-card .info .name {
     font-size: 1.1rem;
     font-weight: bold;
@@ -1363,4 +1343,11 @@ body.dark-theme .nav-buttons button.beacon-flash {
   margin-top: 2px;
   font-size: 11px;
   color: #555;
+}
+#profile-view {
+  height: 100%;               /* заполнить по высоте секции */
+  overflow-y: auto;           /* включить прокрутку при переполнении */
+  -webkit-overflow-scrolling: touch; /* плавный «инерционный» скролл на iOS */
+  padding-bottom: 16px;       /* отступ снизу, чтобы кнопка не прилипала */
+  box-sizing: border-box;     /* чтобы padding не вылезал за границы */
 }

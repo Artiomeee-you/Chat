@@ -18,7 +18,6 @@ import {
     onChildChanged,
     onChildRemoved
   } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
-  // переключатели пола
 const genderBtns = document.querySelectorAll('.gender-btn');
 const hiddenGender = document.getElementById('gender');
 
@@ -30,29 +29,21 @@ genderBtns.forEach(btn => {
   });
 });
 
-// ✅ Устанавливаем значение из активной кнопки при первой загрузке
 const initiallyActiveBtn = document.querySelector('.gender-btn.active');
 if (initiallyActiveBtn) {
   hiddenGender.value = initiallyActiveBtn.dataset.gender;
 }
-// === GEN PATCH END ===
-// начальная активация по value hidden-поля
 
 
-// при клике — переключаем
 genderBtns.forEach(btn => {
   
   btn.addEventListener('click', () => {
-    // убрать active у всех
     genderBtns.forEach(b => b.classList.remove('active'));
-    // поставить этому
     btn.classList.add('active');
-    // обновить скрытое поле (или любую переменную)
     hiddenGender.value = btn.dataset.gender;
   });
 });
 
-    // 1) Firebase
     const firebaseConfig = {
       apiKey:    "AIzaSyCVx5ivejptnndxViX--VF9fUVaEpfxg-s",
       authDomain:"wektorrrrr.firebaseapp.com",
@@ -90,22 +81,27 @@ genderBtns.forEach(btn => {
     const db  = getDatabase(app);
 
 
-// ПРОВЕРКА НА ОНЛАЙН
 const connectedRef = ref(db, '.info/connected');
-const onlineRef = ref(db, `users/${deviceId}/online`);
-
 onValue(connectedRef, (snap) => {
   if (snap.val() === true) {
-    // При отключении → удалить пользователя из базы
-    onDisconnect(ref(db, `users/${deviceId}`)).remove();
-    onDisconnect(ref(db, `activeUsers/${deviceId}`)).remove();
+    onDisconnect(userRef).update(
+      {
+      
+      
+      online:    null,
+      visible:   false,
 
-    // При подключении → online = true, visible = true
+      timestamp: null
+    });
+    showMe = false;
+    
+    onDisconnect(ref(db, `activeUsers/${deviceId}`)).remove();
     set(ref(db, `users/${deviceId}/online`), true);
     update(ref(db, `users/${deviceId}`), { visible: true });
     set(ref(db, `activeUsers/${deviceId}`), { online: true });
-  } 
+  }
 });
+
 
 
     const searchQueueRef = ref(db, 'searchQueue');
@@ -117,8 +113,6 @@ onValue(connectedRef, (snap) => {
         return alert('Пожалуйста, заполните фильтры корректно');
       }
     
-      // Читаем профиль из БД
-      // Получаем одноразово профиль пользователя
 const userRef = ref(db, `users/${deviceId}`);
 const userSnap = await get(userRef);
 if (!userSnap.exists()) {
@@ -130,7 +124,6 @@ const { age: userAge, gender: userGender } = userSnap.val();
         return alert('Профиль не заполнен: укажите пол и возраст в разделе “Профиль”');
       }
     
-      // Кладём запрос в очередь
       set(ref(db, `searchQueue/${deviceId}`), {
         genderFilter, minAge, maxAge,
         userAge, userGender,
@@ -140,7 +133,6 @@ const { age: userAge, gender: userGender } = userSnap.val();
       document.getElementById('searchStatus').textContent = '⏳ Ожидание...';
       
       
-      // Слушаем очередь и ищем пару
       onValue(searchQueueRef, snap => {
         const queue = snap.val() || {};
         for (let otherId in queue) {
@@ -149,15 +141,11 @@ const { age: userAge, gender: userGender } = userSnap.val();
            if (
                o.userAge   >= minAge && o.userAge   <= maxAge &&
                userAge     >= o.minAge  && userAge     <= o.maxAge &&
-               // ваш фильтр (если не пустой) должен совпадать с полом другого
                (genderFilter === '' || genderFilter === o.userGender) &&
-               // фильтр другого (если не пустой) должен совпадать с вашим полом
                (o.genderFilter === '' || o.genderFilter === userGender)
              ) {
-            // Нашлась пара: удаляем оба запроса
             set(ref(db, `searchQueue/${deviceId}`), null);
-            set(ref(db, `searchQueue/${otherId}`), null);
-            // вместо редиректа
+            
             const chatId = [deviceId, otherId].sort().join('_');
             openChat(chatId, otherId, 0);
             break;
@@ -168,51 +156,42 @@ const { age: userAge, gender: userGender } = userSnap.val();
     });
     
     
-// удаление из списка блокировки
 
   const reverseBlocked = {};
   
 
-  // делегируем клики по «Разблокировать»
   document.addEventListener('click', e => {
     if (e.target.matches('.decline-btn')) {
       declineRequest(e.target.dataset.from);
       return;
     }
-    // — остальной ваш делегат (accept-btn, decline-btn, request-btn)…
   });
 
 
 
 
 
-  // 0) Загрузка header/footer (если есть)
   await includeHTML('#header', 'header.html');
   await includeHTML('#footer', 'footer.html');
-// --- Инициализация кнопок поиска по полу ---
 const btnRandom = document.getElementById('genderRandom');
 const btnMale   = document.getElementById('genderMale');
 const btnFem    = document.getElementById('genderFemale');
 const hiddenInp = document.getElementById('genderFilter');
 
-// элементы
 const minRange = document.getElementById('minAgeRange');
 const maxRange = document.getElementById('maxAgeRange');
 const minInput = document.getElementById('minAge');
 const maxInput = document.getElementById('maxAge');
 const track    = document.querySelector('.age-range-slider .slider-track');
 
-// функция для обновления и трека, и полей
 function syncAgeRange() {
   let min = parseInt(minRange.value, 10);
   let max = parseInt(maxRange.value, 10);
-  // не даём налазить
   if (min > max) [min, max] = [max, min];
 
   minInput.value = min;
   maxInput.value = max;
 
-  // вычисляем проценты для градиента
   const minPct = (min - minRange.min) / (minRange.max - minRange.min) * 100;
   const maxPct = (max - maxRange.min) / (maxRange.max - maxRange.min) * 100;
   track.style.background = `
@@ -225,11 +204,9 @@ function syncAgeRange() {
   `;
 }
 
-// события ползунков
 minRange.addEventListener('input', syncAgeRange);
 maxRange.addEventListener('input', syncAgeRange);
 
-// события текстовых полей
 minInput.addEventListener('change', () => {
   let v = parseInt(minInput.value, 10) || minRange.min;
   minRange.value = v;
@@ -241,15 +218,12 @@ maxInput.addEventListener('change', () => {
   syncAgeRange();
 });
 
-// инициализация
 syncAgeRange();
 
 
-// по умолчанию «Случайный»
 hiddenInp.value = '';
 btnRandom.classList.add('active');
 
-// сброс и установка active
 function clearActive() {
   [btnRandom, btnMale, btnFem].forEach(b => b.classList.remove('active'));
 }
@@ -270,7 +244,6 @@ btnFem.addEventListener('click', () => {
   hiddenInp.value = 'female';
 });
 
-// 1) Тоггл панели
 
 
 const blockedPanel     = document.getElementById('blockedPanel');
@@ -287,9 +260,7 @@ const btnMap = document.getElementById('btnMap');
 
 
 
-    // 1. Слушаем все клики по документу
     document.addEventListener('click', e => {
-          // 1) Сначала “Принять” / “Отказать” в попапе
            if (e.target.matches('.accept-btn')) {
              acceptRequest(e.target.dataset.from);
              return;
@@ -299,14 +270,12 @@ const btnMap = document.getElementById('btnMap');
              return;
            }
         
-           // 2) Затем “Подать запрос” на маркере
            const btn = e.target.closest('.request-btn');
            if (btn) {
              sendChatRequest(btn.dataset.to);
            }
          });
   
-  // 2. Функция отправки
   
 
   
@@ -317,11 +286,9 @@ const btnMap = document.getElementById('btnMap');
   let allUsersCache = {};
   let blockedList = {};
   let shouldCenterOnMyMarker = false;
-  // список ID тех, кому мы отправили запрос
   let outgoingRequests = [];
 
-  // сразу объявляем и инициализируем маркер-сайзер
-  let markerSize = +localStorage.getItem('markerSize') || 8;
+  let markerSize = localStorage.getItem('markerSize') || 8;
 
 /**
  * Возвращает L.divIcon в зависимости от данных пользователя
@@ -329,7 +296,6 @@ const btnMap = document.getElementById('btnMap');
  */
 function getIconFor(d) {
   const size = markerSize * 2;
-  // Если есть фото — делаем див-иконку с фоном
   if (d.photoData) {
     const borderColor = d.gender === 'female' ? '#ff69b4' : '#1e90ff';
     return L.divIcon({
@@ -348,7 +314,6 @@ function getIconFor(d) {
       iconAnchor: [size/2, size/2]
     });
   }
-  // Иначе — простой цветной кружок
   const color = d.gender === 'female' ? '#ff69b4' : '#1e90ff';
   return L.divIcon({
     html: `
@@ -365,23 +330,20 @@ function getIconFor(d) {
   });
 }
 
-  // 2) Постоянный deviceId
   
 
   
   const userRef = ref(db, 'users/' + deviceId);
   
 
-     //  —— блокированные мной
 
       const blockedRef = ref(db, `blocked/${deviceId}`);
-      const markers = {}; // для чужих
+      const markers = {};
       let myMarker = null;
 
 
 
 
-// сразу под import’ами или сразу после инициализации db/deviceId
 let initialUsersLoaded = false;
 
 function setupRequestListener() {
@@ -412,63 +374,14 @@ function setupRequestListener() {
 
 
 
-// при получении данных от БД
-onValue(ref(db, 'users'), snapshot => {
-  const seenIds = [];
-
-  snapshot.forEach(child => {
-    const d = child.val(), id = child.key, coords = [d.latitude, d.longitude];
-    // 1) Скрытый профиль
-    if (d.visible === false) {
-      destroyMarker(markers[id]);
-      delete markers[id];
-      return;
-    }
-    
-    seenIds.push(id);
-
-    // 2) Свой профиль (без подсказок)
-    if (d.deviceId === deviceId) {
-      destroyMarker(myMarker);
-      myMarker = L.marker(coords, { icon: myIcon }).addTo(map);
-      return;
-    }
-
-    // 3) Чужой профиль: создаём/обновляем
-    let m = markers[id];
-    if (m) {
-      if (m.getTooltip()) m.unbindTooltip();
-      if (m.getPopup())   m.unbindPopup();
-      m.setLatLng(coords);
-    } else {
-      m = L.marker(coords, { icon: getIconFor(d) }).addTo(map);
-    }
-
-    // 4) Вешаем новый permanent-tooltip
-    const label = `<strong>${d.name}, ${d.age} лет</strong>` +
-                  (d.message ? `<br>${d.message}` : '');
-    
-
-   
-    markers[id] = m;
-  });
-
-  // 6) Удаляем тех, кто ушёл
-  Object.keys(markers).forEach(id => {
-    if (!seenIds.includes(id)) {
-      destroyMarker(markers[id]);
-      delete markers[id];
-    }
-  });
-
-  if (!initialUsersLoaded) {
-       initialUsersLoaded = true;
-       setupRequestListener();  // теперь слушатель запросов встанет после первичной отрисовки маркеров
-     }
-
-
-
+onValue(ref(db, 'users/' + deviceId), snapshot => {
+  const data = snapshot.val();
+  if (data) {
+    console.log('Данные пришли из БД:', data);
+    updateMarkerOnMap(data.latitude, data.longitude);
+  }
 });
+
 
 
       onValue(blockedRef, snap => {
@@ -485,7 +398,6 @@ onValue(ref(db, 'users'), snapshot => {
 
 
 
-  // 3) Фото пользователя
   const photoInput = document.getElementById('photoInput');
   if (photoInput) {
     photoInput.addEventListener('change', e => {
@@ -493,23 +405,19 @@ onValue(ref(db, 'users'), snapshot => {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = () => {
-          // 1) Загружаем во временный Image
           const img = new Image();
           img.onload = () => {
-            // 2) Вычисляем коэффициент масштабирования
-            const maxDim = 100; // желаемый диаметр в пикселях
+            const maxDim = 100;
             const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
             const w = img.width * scale;
             const h = img.height * scale;
       
-            // 3) Рисуем в canvas нужного размера
             const canvas = document.createElement('canvas');
             canvas.width  = w;
             canvas.height = h;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, w, h);
       
-            // 4) Обрезаем в круг: создаём круглый клип
             const size = Math.min(w, h);
             const circ = document.createElement('canvas');
             circ.width  = size;
@@ -519,10 +427,8 @@ onValue(ref(db, 'users'), snapshot => {
             cctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
             cctx.closePath();
             cctx.clip();
-            // центрируем изображение в круге
             cctx.drawImage(canvas, (size - w)/2, (size - h)/2, w, h);
       
-            // 5) Рисуем цветную рамку
             const gender = document.getElementById('gender').value;
 const borderColor = '#ffffff';
 
@@ -532,14 +438,11 @@ cctx.lineWidth = 4;
 cctx.strokeStyle = borderColor;
 cctx.stroke();
       
-            // 6) Экспортируем в dataURL и сохраняем
             photoData = circ.toDataURL('image/png');
             localStorage.setItem('photoData', photoData);
             document.getElementById('profilePhoto').src = photoData;
 
       
-            // (если вы где-то сразу рендерите превью, обновите его, например,
-            // document.getElementById('photoPreview').src = photoData;)
           };
           img.src = reader.result;
         };
@@ -561,7 +464,6 @@ cctx.stroke();
       uploadPhotoButton.textContent = `Выбрано`;
     }
   };
-  // 4) Инициализация карты
   const map = L.map('map', { zoomControl: false })
                .setView([55.751244, 37.618423], 10);
                function destroyMarker(m) {
@@ -578,26 +480,15 @@ cctx.stroke();
 controlsContainer.classList.add('map-controls');
 document.getElementById('map').appendChild(controlsContainer);
 
-// Убираем встроенный контрол
 if (map.zoomControl) {
   map.zoomControl.remove();
 }
-// Свой плюс
-const zoomIn = L.DomUtil.create('a', 'leaflet-control-zoom-in', controlsContainer);
-zoomIn.innerText = '+';
-zoomIn.href = '#';
-zoomIn.onclick = e => { e.preventDefault(); map.zoomIn(); };
 
-// Свой минус
-const zoomOut = L.DomUtil.create('a', 'leaflet-control-zoom-out', controlsContainer);
-zoomOut.innerText = '–';
-zoomOut.href = '#';
-zoomOut.onclick = e => { e.preventDefault(); map.zoomOut(); };
   map.getContainer().addEventListener('click', e => {
     const btn = e.target.closest('.decline-btn');
     if (!btn) return;
     const fromId = btn.dataset.from;
-    if (!fromId) return;              // guard against undefined
+    if (!fromId) return;
     declineRequest(fromId);
     e.stopPropagation();
   });
@@ -605,24 +496,19 @@ zoomOut.onclick = e => { e.preventDefault(); map.zoomOut(); };
     position: 'topright'
   }).addTo(map);
   let showMe = localStorage.getItem('showMe') !== 'false';
-// Глобальный ловец открытия *любого* попапа на карте
 map.on('popupopen', e => {
   const popEl = e.popup.getElement();
-  // Отфильтруем только наши «запросные» попапы
   if (!popEl.querySelector('.request-popup')) return;
 
-  // Блокируем клики от хождения по карте
   L.DomEvent.disableClickPropagation(popEl);
 
-  // Навешиваем слушатель «Принять»
   popEl.querySelector('.accept-btn')
     .addEventListener('click', ev => {
       ev.stopPropagation();
-      const fromId = e.popup._source.options?.icon?._fromId; // см. ниже
+      const fromId = e.popup._source.options?.icon?._fromId;
       acceptRequest(fromId);
     });
 
-  // Навешиваем слушатель «Отказать»
   popEl.querySelector('.decline-btn')
     .addEventListener('click', ev => {
       ev.stopPropagation();
@@ -632,18 +518,15 @@ map.on('popupopen', e => {
 });
 
 
-// B) Функция, чтобы (re)сохранить профиль в БД
 
   
   
 
-// C) Новый контрол “Показывать меня”
 const ShowMeControl = L.Control.extend({
   options: { position: 'topright' },
   onAdd(map) {
     const container = L.DomUtil.create('div', 'leaflet-control show-me-control');
     
-    // чекбокс
     const chk = L.DomUtil.create('input', '', container);
     chk.type = 'checkbox';
     chk.checked = showMe;
@@ -651,7 +534,6 @@ const ShowMeControl = L.Control.extend({
     const lbl = L.DomUtil.create('span', '', container);
     lbl.textContent = '';
 
-    // ползунок размера маркера
     const sizeContainer = L.DomUtil.create('div', '', container);
     const sizeLabel = L.DomUtil.create('span', '', sizeContainer);
     sizeLabel.textContent = '';
@@ -660,16 +542,15 @@ const ShowMeControl = L.Control.extend({
     sizeInput.type = 'range';
     sizeInput.min = '5';
     sizeInput.max = '30';
-    sizeInput.value = markerSize; // переменная из твоего кода
+    sizeInput.value = markerSize;
 
     const sizeValue = L.DomUtil.create('span', '');
     sizeValue.textContent = markerSize + 'px';
 
-    // обновляем значение
     sizeInput.addEventListener('input', () => {
       markerSize = parseInt(sizeInput.value);
       sizeValue.textContent = markerSize + 'px';
-      updateAllMarkersSize();; // твоя функция обновления размера маркера
+      updateAllMarkersSize();;
     });
 
     L.DomEvent.disableClickPropagation(container)
@@ -683,7 +564,7 @@ const ShowMeControl = L.Control.extend({
 
         if (!chk.checked && myMarker) {
           map.removeLayer(myMarker);
-          map.closePopup();    // ← добавляем закрытие
+          map.closePopup();
           myMarker = null;
         }
         
@@ -701,10 +582,8 @@ if (chk) chk.checked = showMe;
 updateMyProfileVisibility(showMe);
 const profilePhotoEl = document.getElementById('profilePhoto');
 if (profilePhotoEl) {
-  //profilePhotoEl.src = 'https://via.placeholder.com/240/00ff00/ffffff?text=+';
 }
  
-  // 5) Ваш маркер (зелёный или фото)
   
 
   let firstLoad = true;
@@ -725,6 +604,11 @@ if (profilePhotoEl) {
       return;
     }
   
+
+
+
+
+    
     if (d.photoData) {
       photoData = d.photoData;
       localStorage.setItem('photoData', photoData);
@@ -739,10 +623,8 @@ if (profilePhotoEl) {
     const genderBtns = document.querySelectorAll('.gender-btn');
     const profileCard = document.getElementById('profileCard');
   
-    // 1️⃣ При первой загрузке заполняем профиль
     if (firstLoad) {
       if (d.gender) {
-          // Обновляем кнопки и hidden-поле
           genderBtns.forEach(b => b.classList.remove('active'));
           const activeBtn = [...genderBtns].find(btn => btn.dataset.gender === d.gender);
           if (activeBtn) {
@@ -751,7 +633,6 @@ if (profilePhotoEl) {
               console.log('✅ Из БД выставлен gender:', hiddenGender.value);
           }
       } else {
-          // Не меняем hiddenGender.value
           console.log('❗ В БД нет gender — оставляем текущее hidden поле:', hiddenGender.value);
       }
   
@@ -791,8 +672,10 @@ if (profilePhotoEl) {
       });
       
       
-      myMarker = L.marker([d.latitude, d.longitude], { icon: myIcon })
-       .addTo(map);
+      if (validCoords(d.latitude, d.longitude)) {
+        myMarker = L.marker([d.latitude, d.longitude], {icon: myIcon}).addTo(map);
+      }
+      
     
     } else {
       if (typeof d.latitude !== 'number' || typeof d.longitude !== 'number') return;
@@ -823,12 +706,10 @@ console.log('✅ Текущее скрытое поле #gender:', hiddenGender.
     });
   });
   
-  // ✅ Устанавливаем значение из активной кнопки при первой загрузке
   const initiallyActiveBtn = document.querySelector('.gender-btn.active');
   if (initiallyActiveBtn) {
     hiddenGender.value = initiallyActiveBtn.dataset.gender;
   }
-  // === GEN PATCH END ===
   
   genderBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -856,7 +737,6 @@ console.log('✅ Текущее скрытое поле #gender:', hiddenGender.
           if (id === deviceId) return;
 
 
-// 1) если пользователь временно скрыт — полностью убираем маркер + тултип
     if (u.visible === false) {
         const m = markers[id];
         if (m) {
@@ -864,46 +744,25 @@ console.log('✅ Текущее скрытое поле #gender:', hiddenGender.
 
 
           
-          // Закрываем и удаляем тултип, если он был привязан
-           // Закрываем все «окна» Leaflet перед удалением
-if (m.getTooltip()) m.closeTooltip();
- if (m.getPopup())   m.closePopup();
- m.unbindTooltip();
- m.unbindPopup();
- map.removeLayer(m);
- delete markers[id];
+          if (m.getTooltip()) {m.closeTooltip();}
+          if (m.getPopup())   m.closePopup();
+           m.unbindTooltip();
+            m.unbindPopup();
+            map.removeLayer(m);
+            delete markers[id];
         }
         return;
       }
 
 
-    // Скрываем пользователей, у которых visible=false
-        // Скрываем пользователей, у которых visible=false
-        if (u.visible === false) {
-          const m = markers[id];
-          if (m) {
-            // отвязываем тултип и попап
-             // 1) Закрываем уже открытый тултип и попап
-      if (m.getTooltip()) m.closeTooltip();
-      if (m.getPopup())  m.closePopup();
-      // 2) Отвязываем их, чтобы не привязались заново
-      m.unbindTooltip();
-      m.unbindPopup();
-      // 3) Удаляем сам маркер
-      map.removeLayer(m);
-      delete markers[id];
-          }
-          return;
-        }
+
     
 
-      // ——— ЗАЩИТА ОТ НЕВАЛИДНЫХ КООРДИНАТ ———
       if (typeof u.latitude !== 'number' || typeof u.longitude !== 'number') {
-        // просто пропускаем этого пользователя
         if (markers[id]) {
           if (markers[id].getPopup()) {
-            markers[id].closePopup();    // закроет привязанный popup
-            markers[id].unbindPopup();   // отвяжет шаблон, чтобы он не «висял» в кэше
+            markers[id].closePopup();
+            markers[id].unbindPopup();
           }
           
         }
@@ -919,7 +778,6 @@ if (m.getTooltip()) m.closeTooltip();
   
       const prev = markers[id];
   
-      // если есть фото — ставим L.marker с divIcon
       if (u.photoData) {
         const borderColor = u.gender === 'female' ? '#ff69b4' : '#1e90ff';
         const html = `
@@ -929,7 +787,6 @@ if (m.getTooltip()) m.closeTooltip();
                  border: 2px solid ${borderColor};
                ">
           </div>`;
-        // если предыдущий маркер — не L.Marker, или его иконка другая — пересоздаём
         if (!(prev instanceof L.Marker)) {
             if (prev) {
                 if (prev.getTooltip()) { prev.closeTooltip(); prev.unbindTooltip(); }
@@ -940,11 +797,9 @@ if (m.getTooltip()) m.closeTooltip();
             icon: L.divIcon({ html, className: '', iconSize: [markerSize*2, markerSize*2] })
           }).addTo(map);
         } else {
-          // просто обновляем HTML иконки
           prev.setIcon(L.divIcon({ html, className: '', iconSize: [markerSize*2, markerSize*2] }));
         }
   
-      // иначе — рисуем круг
       } else {
         const isBlocked = !!blockedList[id] || !!reverseBlocked[id];
         const baseColor = u.gender === 'female' ? '#ff69b4' : '#1e90ff';
@@ -957,7 +812,6 @@ if (m.getTooltip()) m.closeTooltip();
           weight:     isBlocked ? 1   : 2
         };
   
-        // если предыдущий маркер был не кругом — пересоздаём
         if (!(prev instanceof L.CircleMarker)) {
           if (prev) {
                 if (prev.getTooltip()) { prev.closeTooltip(); prev.unbindTooltip(); }
@@ -966,32 +820,36 @@ if (m.getTooltip()) m.closeTooltip();
               }
           markers[id] = L.circleMarker([u.latitude, u.longitude], opts).addTo(map);
         } else {
-          // обновляем стиль уже существующего кружка
           markers[id].setStyle(opts);
         }
       }
-  
-      // тултип (всегда висит)
+      
       const labelHtml = `
-        <strong>${u.name}, ${u.age} лет</strong>
-        ${u.message ? `<br>${u.message}` : ''}
-      `;
-     // после labelHtml
+  <strong>${u.name}, ${u.age}</strong>
+  ${u.message ? `<br>${u.message}` : ''}
+`;
+
+// ✅ предварительно удаляем старый tooltip, если он есть
+if (markers[id].getTooltip()) {
+  markers[id].unbindTooltip();
+}
+
 markers[id].bindTooltip(labelHtml, {
   permanent: true,
   direction: 'top',
-  offset: [0, -markerSize],   
+  offset: [0, -markerSize],
   className: 'user-tooltip'
 });
 
+//ЭТОТОТОТОТОТОТОТОТОТОТО
   
-      // клики для открытия попапа
       markers[id].off('click').on('click', () => {
         const popupHtml =
           `<strong>${u.name}, ${u.age} лет</strong>` +
           (u.message ? `<br>${u.message}` : '') +
           `<br><button class="request-btn" data-to="${id}">Подать запрос</button>`;
         markers[id].bindPopup(popupHtml, { autoClose: true, closeOnClick: true })
+        .openPopup();
       });
     });
   
@@ -1000,44 +858,66 @@ markers[id].bindTooltip(labelHtml, {
   
 
 
-  // 7) Сохранение/обновление профиля
   const saveBtn = document.getElementById('saveProfile');
-  saveBtn.textContent = localStorage.getItem('profileSent') ? 'Обновить' : 'Сохранить';
+  
+    if  (saveBtn.textContent == 'Cохранено') saveBtn.textContent = 'Сохранено'
+    else { saveBtn.textContent = localStorage.getItem('profileSent') ? 'Обновить' : 'Сохранить';}
+ 
+
+ saveBtn.addEventListener('click', () => {
+  if (saveBtn.disabled) return;
+  saveBtn.disabled = true;
+
+  const name   = document.getElementById('username').value.trim();
+  const age    = document.getElementById('age').value.trim();
+  const gender = document.getElementById('gender').value;
+  const msg    = document.getElementById('message').value.trim();
+  if (!name || !age) {
+    alert('Введите имя и возраст!');
+    saveBtn.disabled = false;
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      save(name, age, gender, msg, pos.coords.latitude, pos.coords.longitude)
+        .then(() => {
+          saveBtn.disabled = false;
+        })
+        .catch(err => {
+          console.error(err);
+          saveBtn.disabled = false;
+        });
+    },
+    err => {
+      console.error('Ошибка геолокации:', err);
+      alert('Не удалось получить местоположение.');
+      saveBtn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+  );
+  saveBtn.textContent = 'Cохранено';
+
+});
 
   
-  saveBtn.textContent = localStorage.getItem('profileSent') ? 'Обновить' : 'Сохранить';
-  saveBtn.addEventListener('click', () => {
-    const name   = document.getElementById('username').value.trim();
-    const age    = document.getElementById('age').value.trim();
-    const gender = document.getElementById('gender').value;
-    const msg    = document.getElementById('message').value.trim();
-    if (!name || !age) return alert('Введите имя и возраст!');
-    navigator.geolocation.getCurrentPosition(
-      pos => {save(name, age, gender, msg, pos.coords.latitude, pos.coords.longitude)},
-      ()   => { const c = map.getCenter(); save(name, age, gender, msg, c.lat, c.lng); },
-      { enableHighAccuracy:true, timeout:5000, maximumAge:0 }
-    );
-  });
+  
 
 
-
-  // То, что я отправляю на БД
   function save(name, age, gender, msg, lat, lng) {
-    const earthRadius = 6371000;  // радиус Земли ~6 371 000 м
-  const radius = 2000;         // радиус случайного смещения (1 км в метрах)
-  const randomDistance = Math.random() * radius;        // случайная дистанция [0, 1000] м
-  const randomAngle = Math.random() * 2 * Math.PI;      // случайный угол [0, 2π] радиан
-  // Рассчитываем смещение в градусах широты и долготы:
+    const earthRadius = 6371000;
+  const radius = 2000;
+  const randomDistance = Math.random() * radius;
+  const randomAngle = Math.random() * 2 * Math.PI;
   const offsetLat = (randomDistance * Math.cos(randomAngle)) / earthRadius * (180 / Math.PI);
   const offsetLng = (randomDistance * Math.sin(randomAngle)) / 
                     (earthRadius * Math.cos(lat * Math.PI / 180)) * (180 / Math.PI);
-  // Применяем смещение к исходным координатам
   lat = lat + offsetLat;
   lng = lng + offsetLng;
     set(userRef, { 
         name, age, gender, message: msg, 
         photoData,
-        visible: true,         // <— обязательно
+        visible: true,
         latitude: lat , longitude: lng,
         timestamp: Date.now() 
       })
@@ -1047,36 +927,17 @@ markers[id].bindTooltip(labelHtml, {
         localStorage.setItem('lastAge',  age);
         localStorage.setItem('lastGender', gender); 
         localStorage.setItem('lastMsg',  msg);
-        saveBtn.textContent = 'Обновить';
-        startWatch(name, age, gender, msg);
+        
+
       })
       .catch(e => console.error(e) || alert('Не удалось сохранить профиль.'));
   }
-  sizeInput.addEventListener('input', e => {
-    markerSize = +e.target.value;
-    sizeLabel.textContent = markerSize;
-    localStorage.setItem('markerSize', markerSize);
-    
-    updateAllMarkersSize();
 
-    
-  });
 
   
- // Вместо onChildAdded — один раз и при любых изменениях
-onValue(requestsRef, snap => {
-  const pendingIds = [];
-  snap.forEach(child => {
-    const req = child.val();
-    if (req.status === 'pending') {
-      pendingIds.push(child.key);
-    }
-  });
-  showAllIncomingRequests(pendingIds);
-});
 
 
-  // после инициализации db и deviceId
+
 
   const requestsRef = ref(db, `requests/${deviceId}`);
  
@@ -1094,7 +955,6 @@ onChildRemoved(requestsRef, snap => {
 
   let requestFlag = 1;   
   const declined = {};
-  // 1) Новый запрос
   onChildAdded(requestsRef, snap => {
     const req = snap.val();
      if (requestFlag===1 
@@ -1104,28 +964,23 @@ onChildRemoved(requestsRef, snap => {
       shown[snap.key] = true;
       showIncomingRequest(snap.key);
   
-      // включаем Beacon Flash
       btnMap.classList.add('beacon-flash');
     }
   }
   
   );
   
-  // Функция для закрытия «pending»-попапа и восстановления дефолтного
   
   
-  // 2) Изменился статус (accepted или declined)
   onChildChanged(requestsRef, snap => {
     const { status } = snap.val() || {};
     if (status !== 'pending') closeAndRebind(snap.key);
   });
   
-  // 3) Запись удалили (null)
   onChildRemoved(requestsRef, snap => {
     closeAndRebind(snap.key);
   });
   
-  // Вспомогательный метод — привязывает обычный popup «info + Подать запрос»
   
   
 });
@@ -1134,23 +989,14 @@ onChildRemoved(requestsRef, snap => {
 
 
 
-// новый — просто удаляем запрос
 
   
 
 
 
   
-  if (localStorage.getItem('profileSent')&& localStorage.getItem('lastGender')) {
-    startWatch(
-      localStorage.getItem('lastName'),
-      localStorage.getItem('lastAge'),
-      localStorage.getItem('lastGender'),
-      localStorage.getItem('lastMsg')
-    );
-  }
 
-  // 9) Тема светлая/тёмная
+
   const lightBtn = document.getElementById('lightMode');
   const darkBtn  = document.getElementById('darkMode');
   let theme = localStorage.getItem('theme') || 'light';
@@ -1159,14 +1005,12 @@ onChildRemoved(requestsRef, snap => {
   darkBtn .onclick = () => applyTheme('dark');
   
 
-  // 10) Цветовые акценты
   const squares = document.querySelectorAll('.color-square');
   let accent = localStorage.getItem('accent') || getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
   applyAccent(accent);
   squares.forEach(sq => sq.onclick = () => applyAccent(sq.dataset.color));
   
 
-  // 11) Навигация по экранам
   const screensEl   = document.getElementById('screens');
   const btnFeat     = document.getElementById('btnFeatures');
   
@@ -1177,7 +1021,6 @@ onChildRemoved(requestsRef, snap => {
   btnFeat.onclick = () => showScreen(0);
  
   btnProf.onclick = () => showScreen(1);
-  // Единый обработчик для «Карта»
   
   
   btnMap.addEventListener('click', () => {
@@ -1198,7 +1041,6 @@ onChildRemoved(requestsRef, snap => {
   
 
 
- // рендер списка заблокированных в профиле
 
   
 
@@ -1263,26 +1105,21 @@ function sendChatRequest(toId) {
   })
 
      .then(() => {
-        // после успешной отправки — запоминаем, кому отправили
             outgoingRequests.push(toId);
           })
 
        .then(() => {
              alert('Запрос отправлен');
-             // подписываемся на принятие и показываем чат на карте
              const myReqRef = ref(db, `requests/${toId}/${deviceId}`);
              onValue(myReqRef, snap => {
                if (snap.val()?.status === 'accepted') {
-                 // сначала открываем чат
       const chatId = [deviceId, toId].sort().join('_');
       openChat(chatId, toId);
-      // РЕДАКТИРУЕМ ЧАТ
       outgoingRequests.forEach(otherId => {
         if (otherId !== toId) {
           set(ref(db, `requests/${otherId}/${deviceId}`), null);
         }
       });
-      // сбрасываем массив — теперь активен только этот чат
       outgoingRequests = [toId];
                }
              });
@@ -1307,43 +1144,19 @@ onChildRemoved(requestsRef, snap => {
 
 
 
-function save(name, age, gender, msg, lat, lng) {
-  const dataToSave = {
-    name,
-    age,
-    gender,  // ← всегда добавляем, как name
-    message: msg,
-    photoData,
-    visible: true,
-    latitude: lat,
-    longitude: lng,
-    timestamp: Date.now()
-  };
-
-  console.log('📦 Отправляем в БД:', dataToSave);
-
-  set(userRef, dataToSave)
-    .then(() => onSaveSuccess(name, age, gender, msg))
-    .catch(err => {
-      console.error('❌ Ошибка сохранения профиля:', err);
-      alert('Не удалось сохранить профиль:\n' + (err.message || JSON.stringify(err)));
-    });
-}
 
 
 
 
 
-// === 1) Надёжная updateMyProfileVisibility ===
+
 function updateMyProfileVisibility(flag) {
   showMe = flag;
   localStorage.setItem('showMe', String(flag));
 
-  // готовим апдейт: всегда обновляем видимость, и при включении — фото
   const updates = { visible: flag };
   if (flag && photoData) updates.photoData = photoData;
 
-  // возвращаем Promise, чтобы можно было дождаться завершения
   return update(ref(db, `users/${deviceId}`), updates)
   .then(() => {
     if (!flag && myMarker) {
@@ -1365,7 +1178,7 @@ function closeAndRebind(fromId) {
   m.closePopup();
   m.unbindPopup();
   bindDefaultPopup(fromId);
-  delete shown[fromId];      // теперь shown определён в области видимости
+  delete shown[fromId];
 }
 
 
@@ -1410,15 +1223,12 @@ function acceptRequest(fromId) {
   const chatId = [deviceId, fromId].sort().join('_');
   const updates = {};
 
-  // создаём участников чата
   updates[`chats/${chatId}/members/${deviceId}`] = true;
   updates[`chats/${chatId}/members/${fromId}`]   = true;
-  // текущий запрос — accepted
   updates[`requests/${deviceId}/${fromId}`] = {
     status:    'accepted',
     timestamp: Date.now()
   };
-  // удаляем все прочие исходящие pending
   outgoingRequests.forEach(otherId => {
     if (otherId !== fromId) {
       updates[`requests/${otherId}/${deviceId}`] = null;
@@ -1434,29 +1244,27 @@ function acceptRequest(fromId) {
 }
 
 
-
+function validCoords(lat, lng) {
+  return Number.isFinite(lat) && Number.isFinite(lng);
+}
 
 
 
 function declineRequest(fromId) {
-  // сначала сразу убираем попап в UI
   closeAndRebind(fromId);
 
 
-  // потом удаляем запрос из БД
   set(ref(db, `requests/${deviceId}/${fromId}`), null)
     .catch(console.error);
 }
 
 
 document.addEventListener('click', e => {
-  // если кликнули «Принять»
   if (e.target.matches('.accept-btn')) {
     e.stopPropagation();
     acceptRequest(e.target.dataset.from);
     return;
   }
-  // если кликнули «Отказать»
   if (e.target.matches('.decline-btn')) {
     e.stopPropagation();
     declineRequest(e.target.dataset.from);
@@ -1491,7 +1299,6 @@ function showIncomingRequest(fromId) {
     </div>
   `;
 
-  // Привязываем и открываем попап
   m.unbindPopup()
    .bindPopup(popupContent, {
     
@@ -1501,13 +1308,10 @@ function showIncomingRequest(fromId) {
    })
    .openPopup();
 
-  // ← сразу после openPopup() получаем DOM-попапа
   const popEl = m.getPopup().getElement();
 
-  // разрешаем кликам «пробиваться» через Leaflet
   L.DomEvent.disableClickPropagation(popEl);
 
-  // навешиваем локальные обработчики на кнопки
   popEl.querySelector('.accept-btn').addEventListener('click', e => {
     e.stopPropagation();
     acceptRequest(fromId);
@@ -1522,10 +1326,8 @@ function showIncomingRequest(fromId) {
 
 
 function updateAllMarkersSize() {
-  // 1) Сохранить новый размер
   localStorage.setItem('markerSize', markerSize);
 
-  // 2) Обновить значение у ползунка
   const sizeValueEl = document.querySelector(
     '.leaflet-control.show-me-control input[type="range"] + span'
   );
@@ -1533,10 +1335,8 @@ function updateAllMarkersSize() {
     sizeValueEl.textContent = markerSize + 'px';
   }
 
-  // 3) Обновить ваш маркер
   if (myMarker) {
     if (photoData) {
-      // пересоздаем divIcon с фотографией
       const borderColor = '#006400';
       const html = `
         <div style="
@@ -1565,12 +1365,10 @@ function updateAllMarkersSize() {
       myMarker.setIcon(myIcon);
 
     } else if (typeof myMarker.setRadius === 'function') {
-      // обычный векторный кружок
       myMarker.setRadius(markerSize);
     }
   }
 
-  // 4) Обновить всех остальных через styleMarker
   Object.keys(markers).forEach(id => styleMarker(id));
 }
 
@@ -1580,7 +1378,6 @@ document.getElementById('deletePhotoButton').addEventListener('click', () => {
   document.getElementById('profilePhoto').src = 'https://via.placeholder.com/240';
   localStorage.removeItem('photoData');
 
-  // Если используешь Firebase, обнови данные там тоже:
   const userRef = ref(database, `users/${deviceId}`);
   update(userRef, { photoData: null });
 });
@@ -1589,11 +1386,8 @@ document.getElementById('deletePhotoButton').addEventListener('click', () => {
 
 function openChat(chatId, peerId, screenIndex = 2) {
   updateMyProfileVisibility(false);
-      // переключаемся на экран “Карта” и показываем оверлей
       showScreen(screenIndex);
-  // подсвечиваем кнопку навигации
  
-      // Находим кнопку «Карта» и вешаем на неё свой обработчик
       
       const overlay = document.getElementById('chatOverlay');
       overlay.style.display = 'flex';
@@ -1608,9 +1402,8 @@ function openChat(chatId, peerId, screenIndex = 2) {
 
 
 
-         // 1) Публикуем, что мы в чате
          const myPresRef = ref(db, `chats/${chatId}/presence/${deviceId}`);
-         
+
          set(myPresRef, true);
          onDisconnect(myPresRef).remove();
          overlay.innerHTML = `
@@ -1626,25 +1419,21 @@ function openChat(chatId, peerId, screenIndex = 2) {
     <div class="chat-input">
       
       <input id="msgInput" placeholder="Введите сообщение…" />
-      <button id="sendMsg">➤</button>
+      <button id="sendMsg">  ➤  </button>
       <div id="emojiPicker" class="emoji-picker"></div>
     </div>
   </div>
 `;
 
-       // элементы
 
 const emojiPicker = document.getElementById('emojiPicker');
 const msgInput    = document.getElementById('msgInput');
 const chatInputEl = overlay.querySelector('.chat-input');
-// 1) Список эмоджи (можете расширить)
 const emojis = ['😀','😂','😊','😉','😍','🤔','😢','👍','🙏','🎉'];
 emojiPicker.innerHTML = emojis.map(e => `<span>${e}</span>`).join('');
 
-// 2) Тоггл панели по клику
 
 
-// 3) Вставка эмоджи в поле по клику
 emojiPicker.addEventListener('click', e => {
   const span = e.target.closest('span');
   if (!span) return;
@@ -1652,26 +1441,53 @@ emojiPicker.addEventListener('click', e => {
   msgInput.focus();
 });
 
-// 4) Скрытие панели при клике вне
 
 
 
-       // 2) Подписываемся на статус присутствия собеседника
        const peerPresRef = ref(db, `chats/${chatId}/presence/${peerId}`);
 onValue(peerPresRef, snap => {
+  
   const inChat = snap.val() === true;
   const name = allUsersCache[peerId]?.name || peerId;
+  const chatStatusEl = document.getElementById('chatStatus');
+chatStatusEl.textContent = `${name} ${inChat ? 'в чате' : 'не в чате'}`;
+chatStatusEl.style.color = inChat ? '' : 'red';
   document.getElementById('chatStatus').textContent =
     `${name} ${inChat ? 'в чате' : 'не в чате'}`;
 });
-     310    // слушаем Exit и Block
   
-     const mapSection = document.getElementById('welcome'); // контейнер карты
+     const mapSection = document.getElementById('welcome');
 
      document.getElementById('exitChat').onclick = () => {
-      updateMyProfileVisibility(true)
-      .finally(() => window.location.reload());
+      get(ref(db, `activeChats/${deviceId}`)).then(snap => {
+        
+        if (chatId) {
+          const updates = {};
+          const presenceRef = ref(db, `chats/${chatId}/presence/${peerId}`);
+          
+          get(presenceRef).then(snap => {
+            const isPeerPresent = snap.exists() && snap.val() === true;
+            if (!isPeerPresent) {
+              updates[`activeChats/${deviceId}`] = null;
+              updates[`activeChats/${peerId}`]   = null;
+              updates[`chats/${chatId}`]         = null;
+              update(ref(db), updates).then(() => {
+                
+              });
+            } else {
+              
+            }
+          });
+        }
+        
+      })
+      .then(() => {
+        updateMyProfileVisibility(true).finally(() => window.location.reload());
+      });
     };
+    
+    
+    
     
 
 document.getElementById('blockChat').onclick = () => {
@@ -1689,7 +1505,6 @@ document.getElementById('blockChat').onclick = () => {
 
 
 
-  // слушаем новые сообщения
   const msgsRef = ref(db, `chats/${chatId}/messages`);
   onValue(msgsRef, snap => {
       const msgs = snap.val() || {};
@@ -1699,18 +1514,17 @@ document.getElementById('blockChat').onclick = () => {
         const div = document.createElement('div');
         div.className = 'message ' + (m.from === deviceId ? 'me' : 'peer');
         div.textContent = m.text;
-        box.appendChild(div);          // <- вставляем в контейнер
+        box.appendChild(div);
       });
       box.scrollTop = box.scrollHeight;
     });
  
   
-  // отправка
   document.getElementById('sendMsg').onclick = () => {
     const msgInput = document.getElementById('msgInput');
 msgInput.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
-    e.preventDefault();                   // чтобы строка не разбивалась
+    e.preventDefault();
     document.getElementById('sendMsg').click();
   }
 });
@@ -1724,11 +1538,10 @@ msgInput.addEventListener('keydown', function(e) {
     });
     document.getElementById('msgInput').value = '';
   };
-      // отправка по нажатию Enter в поле
       msgInput = document.getElementById('msgInput');
       msgInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
-          e.preventDefault();           // чтобы не срабатывал перенос строки
+          e.preventDefault();
           document.getElementById('sendMsg').click();
         }
       });
@@ -1742,42 +1555,12 @@ function onSaveSuccess(name, age, gender, msg) {
   localStorage.setItem('lastMsg',   msg);
   localStorage.setItem('lastGender', gender);
  
-  startWatch(name, age, gender, msg);
+ 
 }
 
 function onSaveError(err) {
   console.error('Ошибка сохранения профиля:', err);
   alert('Не удалось сохранить профиль.');
-}
-// 8) Постоянное слежение
-function startWatch(name, age, gender, msg) {
-  if ('geolocation' in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        const updates = {
-          name,
-          age,
-          gender,  // ← всегда добавляем
-          message: msg,
-          latitude,
-          longitude,
-          timestamp: Date.now()
-        };
-        update(userRef, updates)
-          .catch(console.error);
-      },
-      error => {
-        console.error('Гео-ошибка:', error);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
-      }
-    );
-  } else {
-    console.warn('Геолокация не поддерживается в этом браузере');
-  }
 }
 
 const genderSelect = document.getElementById('gender');
@@ -1796,18 +1579,15 @@ function styleMarker(id) {
   const m = markers[id];
   if (!u || !m) return;
 
-  // считаем, заблокировали ли мы или нас
   const byMe   = !!blockedList[id];
   const byThem = !!reverseBlocked[id];
   const blocked = byMe || byThem;
 
-  // цвет по гендеру или серый, если blocked
   const baseColor = u.gender === 'female' ? '#ff69b4' : '#1e90ff';
   const col       = blocked ? '#888888' : baseColor;
   const opacity   = blocked ? 0.6      : 1;
   const weight    = blocked ? 1        : 2;
 
-  // 1) Если это векторный кружок
   if (m instanceof L.CircleMarker) {
     m.setStyle({
       radius:      markerSize,
@@ -1818,50 +1598,7 @@ function styleMarker(id) {
     });
     
 
-  // 2) Если это L.Marker с divIcon (фото или fallback-круг)
-  } else if (m instanceof L.Marker) {
-    // собираем html с нужным цветом рамки и прозрачностью
-    let html;
-    if (u.photoData) {
-      html = `
-        <div class="user-photo"
-             style="
-               background-image: url('${u.photoData}');
-               border: 2px solid ${col};
-               opacity: ${opacity};
-             ">
-        </div>`;
-    // *** force rebind tooltip with new offset ***
-const tt = m.getTooltip();
-if (tt) {
-  const content = tt.getContent();
-  m.unbindTooltip();
-  m.bindTooltip(content, {
-    permanent: true,
-    direction: 'top',
-    offset: [0, -markerSize],    // ← теперь каждый раз берём актуальный markerSize
-    className: 'user-tooltip'
-  });
-}
-} else {
-      html = `
-        <div style="
-             width: ${markerSize*2}px;
-             height: ${markerSize*2}px;
-             background: ${col};
-             border-radius: 50%;
-             opacity: ${opacity};
-           ">
-        </div>`;
-    }
-
-    m.setIcon(L.divIcon({
-      html,
-      className: '',
-      iconSize:   [markerSize*2, markerSize*2],
-      iconAnchor: [markerSize,    markerSize]
-    }));
-  }
+  } 
 }
 
 

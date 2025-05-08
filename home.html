@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+  <link rel="icon" href="MapChat.png" type="image/png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
   <title>MapChat — Главная</title>
 
-  <!-- Общие стили -->
   <link rel="stylesheet" href="style.css"/>
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
 
   <style>
@@ -31,14 +30,13 @@
       color: var(--text-dark);
     }
 
-    /* контейнер трёх экранов: учитываем шапку сверху (60px) и панель снизу (60px) */
     .screens {
       position: absolute;
       top: 60px;
       bottom: 60px;
       left: 0; right: 0;
       display: flex;
-      width: 300vw;   /* 3 × 100vw */
+      width: 300vw;
       height: auto;
       transition: transform 0.3s ease;
       overflow: hidden;
@@ -53,13 +51,11 @@
       background: var(--bg-dark);
     }
 
-    /* заголовки */
     .screen h2 {
       margin: 0 0 16px;
       font-size: 1.5rem;
     }
 
-    /* стили для «Спец. возможности» */
     .feature {
       display: flex; justify-content: space-between; align-items: center;
       padding:12px; margin-bottom:12px;
@@ -87,7 +83,6 @@
     body.dark-theme .toggle { background:#444 }
     body.dark-theme .toggle-btn { color:#eee }
 
-    /* цветовые акценты */
     .color-options { display:flex; gap:8px; margin-top:8px }
     .color-square {
       width:24px; height:24px; border-radius:4px;
@@ -104,10 +99,8 @@
     .light-purple { background:#d8b4fe }
     .dark-purple  { background:#5b21b6 }
 
-    /* карта */
     .map-container {
       width:100%;
-      /* высота = 100vh − навигация (60px) − padding сверху/снизу (48px) */
       height: calc(100vh - 60px - 48px);
       position: relative;
     }
@@ -125,7 +118,6 @@
       transition:background .2s;
     }
 
-    /* профиль */
     #profile select,
     #profile input,
     #profile textarea {
@@ -197,7 +189,6 @@
   padding: 24px 0;
 }
 
-/* сама карточка поиска */
 #features .chat-search {
   background: #fff;
   border-radius: 12px;
@@ -210,13 +201,11 @@
   gap: 16px;
 }
 
-/* тёмная тема */
 body.dark-theme #features .chat-search {
   background: #2a2a3d;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
-/* поля возраста */
 #features .chat-search input[type="text"] {
   width: 100%;
   padding: 10px 14px;
@@ -231,7 +220,6 @@ body.dark-theme #features .chat-search input[type="text"] {
   color: #eee;
 }
 
-/* кнопка поиска */
 #searchButton {
   width: 100%;
   padding: 12px;
@@ -247,7 +235,6 @@ body.dark-theme #features .chat-search input[type="text"] {
   background: #4338ca;
 }
 
-/* группа кнопок «Случайный», «М»/«Ж» */
 #features .search-gender {
   display: flex;
   flex-direction: column;
@@ -279,7 +266,6 @@ body.dark-theme #features .chat-search input[type="text"] {
   gap: 8px;
 }
 
-/* тёмная тема для кнопок */
 body.dark-theme #features .search-gender-btn {
   background: #3a3a50;
   border-color: #555;
@@ -290,7 +276,6 @@ body.dark-theme #features .search-gender-btn.active {
   border-color: var(--primary);
 }
 
-/* статус ожидания */
 #searchStatus {
   font-size: .9rem;
   color: var(--text-light);
@@ -300,12 +285,9 @@ body.dark-theme #features .search-gender-btn.active {
 body.dark-theme #searchStatus {
   color: var(--text-dark);
 }
-/* «Поднимаем» оверлей над header/nav и сдвигаем его под шапку и над футером */
 
 
-/* обёртка окна чата */
 
-/* небольшой отступ между header чата и списком сообщений */
 .chat-overlay .chat-header {
   padding: 12px;
 }
@@ -315,33 +297,30 @@ body.dark-theme #searchStatus {
   top: 60px;
   bottom: 60px;
   left: 0; right: 0;
-  display: none;         /* скрыт по умолчанию */
+  display: none;
   z-index: 1001;
   background: rgba(255,255,255,0.9);
   flex-direction: column;
 }
 
 
-/* Контейнер самого окна чата */
 .chat-overlay .chat-window {
   flex: 1;
   display: flex;
   flex-direction: column;
   background: #fff;
-  margin: 0;            /* убираем центрирование */
-  width: 100%;          /* 100% ширины оверлея */
-  max-width: none;      /* снимаем ограничение */
-  border-radius: 0;     /* по желанию, чтобы края совпали с оверлеем */
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  border-radius: 0;
   overflow: hidden;
 }
 
 
-/* Полю ввода гарантируем видимость */
 .chat-overlay .chat-input {
-  flex-shrink: 0;          /* не сжимается */
+  flex-shrink: 0;
 }
 
-/* Метки над полем поиска */
 .search-label {
   display: block;
   font-size: 0.95rem;
@@ -350,7 +329,6 @@ body.dark-theme #searchStatus {
   margin-bottom: 8px;
 }
 
-/* Блок для двух инпутов возраста */
 .age-inputs {
   display: flex;
   align-items: center;
@@ -358,14 +336,12 @@ body.dark-theme #searchStatus {
   margin-bottom: 16px;
 }
 
-/* Разделитель между мин и макс */
 .age-sep {
   font-size: 1.2rem;
   color: #666;
 }
 
 
-/* контейнер и фон «трек» */
 .age-range-slider {
   position: relative;
   height: 6px;
@@ -378,21 +354,19 @@ body.dark-theme #searchStatus {
   background: #ddd;
   transform: translateY(-50%);
   border-radius: 2px;
-  /* фон выбранного диапазона будем задавать через JS */
 }
 
-/* сами ползунки */
 .age-range-slider input[type="range"] {
   position: absolute;
   top: 0; left: 0;
   width: 100%;
   height: 6px;
   background: none;
-  pointer-events: none; /* делают всю полосу кликабельной, но перехват событий потом */
+  pointer-events: none;
   -webkit-appearance: none;
 }
 .age-range-slider input[type="range"]::-webkit-slider-thumb {
-  pointer-events: all; /* только «ползунок» перехватывает клики */
+  pointer-events: all;
   -webkit-appearance: none;
   width: 16px; height: 16px;
   border-radius: 50%;
@@ -401,23 +375,32 @@ body.dark-theme #searchStatus {
   box-shadow: 0 0 2px rgba(0,0,0,0.3);
   cursor: pointer;
 }
-
+#chatStatus {
+  font-weight: bold;
+  font-size: 16px;
+  color: var(--primary);
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  display: inline-block;
+  margin-right: 10px;
+}
+.dark-theme #chatStatus {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--primary);
+}
   </style>
 </head>
 <body>
   <div id="requestList" class="request-list"></div>
-    <!-- шапка (опционально) -->
     <div id="header"></div>
   
-    <!-- контейнер экранов -->
     <div class="screens" id="screens">
 
-      <!-- 0: Возможности -->
       <section class="screen" id="features">
         <div class="profile-wrapper">
           <div class="chat-search">
       
-            <!-- Метка для пола -->
             <label class="search-label" for="genderFilter">Пол собеседника</label>
             <div class="search-gender">
               <button type="button" id="genderRandom" class="search-gender-btn large active">
@@ -436,7 +419,6 @@ body.dark-theme #searchStatus {
             <div id="waitingOverlay" class="waiting-overlay hidden">
               <div class="waiting-pulse"></div>
             </div>
-            <!-- Метка для возраста -->
             <label class="search-label" for="minAge">Возраст собеседника</label>
             <div class="age-inputs">
               <input type="text" id="minAge" placeholder="мин" size="4">
@@ -461,7 +443,6 @@ body.dark-theme #searchStatus {
       </section>
       
     
-      <!-- 1: Профиль -->
       <section class="screen" id="profile">
         <div id="profile-view">
           
@@ -504,12 +485,10 @@ body.dark-theme #searchStatus {
                   <button class="btn-update" id="uploadPhotoButton" style="flex: 1;">Добавить фото</button>
                   <button class="btn-delete" id="deletePhotoButton" style="flex: 0;">✖</button>
                 </div>
-                <!-- контейнер переключателей пола -->
 <div class="gender-buttons" id="genderButtons">
   <button type="button" class="gender-btn" data-gender="male">Мужской</button>
   <button type="button" class="gender-btn" data-gender="female">Женский</button>
 </div>
-<!-- скрытое поле для формы, если нужно -->
 <input type="hidden" id="gender" value="">
 
 
@@ -539,7 +518,6 @@ body.dark-theme #searchStatus {
         </div>
       </section>
     
-      <!-- 2: Карта -->
       <section class="screen" id="welcome">
         <div class="map-container">
           <div id="map"></div>
@@ -552,7 +530,6 @@ body.dark-theme #searchStatus {
 
     <div id="chatOverlay" class="chat-overlay"></div>
     
-    <!-- Навигация -->
     <nav class="nav-buttons">
       <button id="btnFeatures" data-index="0" >Быстрый чат</button>
       <button id="btnProfile" data-index="1"class="active">Профиль</button>
@@ -561,9 +538,7 @@ body.dark-theme #searchStatus {
     
   
     <div id="footer"></div>
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <!-- Основная логика -->
   <script type="module" src="home.js"></script>
   
   

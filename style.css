@@ -1,3 +1,105 @@
+.leaflet-control-attribution {
+  opacity: 0.1;
+}
+.chat-window {
+  width: 320px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+.dark-theme .chat-window {
+  background: #222;
+  border-color: #444;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--primary);
+  color: #fff;
+  padding: 10px;
+}
+
+.chat-header #chatStatus {
+  font-weight: 500;
+  font-size: 14px;
+  background: rgba(255,255,255,0.2);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background: #f9f9f9;
+}
+
+.dark-theme .chat-messages {
+  background: #2a2a2a;
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-top: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.dark-theme .chat-input {
+  background: #2c2c2c;
+  border-color: #444;
+}
+
+.chat-input input {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  outline: none;
+}
+
+.chat-input button {
+  margin-left: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 16px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background: var(--primary-dark);
+}
+
+#emojiPicker {
+  position: absolute;
+  bottom: 60px;
+  right: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 8px;
+  display: none; /* по умолчанию скрыто */
+}
+
+.dark-theme #emojiPicker {
+  background: #333;
+  border-color: #444;
+}
+
+
 #profile-view {
   display: flex;
   justify-content: center;
@@ -577,6 +679,11 @@ body {
     padding: 20px;
     background: #f9f9f9;
   }
+  #sendMsg {
+    font-size: 40px;
+        /* чтобы высота строки была ровно по размеру шрифта */
+    padding: 2px;         /* при необходимости скорректировать отступы */
+  }
   
   /* поле ввода + кнопка */
   .chat-overlay .chat-input {
@@ -587,13 +694,15 @@ body {
     background: #fff;
   }
   .chat-overlay .chat-input input {
-    flex: 1;
-    padding: 20px;
+    flex: 0.9;
+    padding: 17px;
     border: 1px solid #ccc;
     border-radius: 4px;
     outline: none;
+    font-size: 1.2rem;
   }
   .chat-overlay .chat-input button {
+    flex: 0.1;
     margin-left: 8px;
     padding: 20px 30px;
     border: none;
@@ -1350,4 +1459,102 @@ body.dark-theme .nav-buttons button.beacon-flash {
   -webkit-overflow-scrolling: touch; /* плавный «инерционный» скролл на iOS */
   padding-bottom: 16px;       /* отступ снизу, чтобы кнопка не прилипала */
   box-sizing: border-box;     /* чтобы padding не вылезал за границы */
+}
+
+.chat-window {
+  width: 320px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+.dark-theme .chat-window {
+  background: #222;
+  border-color: #444;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--primary);
+  color: #fff;
+  padding: 10px;
+}
+
+.chat-header #chatStatus {
+  font-weight: 500;
+  font-size: 14px;
+  background: rgba(255,255,255,0.2);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background: #f9f9f9;
+}
+
+.dark-theme .chat-messages {
+  background: #2a2a2a;
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-top: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.dark-theme .chat-input {
+  background: #2c2c2c;
+  border-color: #444;
+}
+
+.chat-input input {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  outline: none;
+}
+
+.chat-input button {
+  margin-left: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 16px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background: var(--primary-dark);
+}
+
+#emojiPicker {
+  position: absolute;
+  bottom: 60px;
+  right: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 8px;
+  display: none; /* по умолчанию скрыто */
+}
+
+.dark-theme #emojiPicker {
+  background: #333;
+  border-color: #444;
 }
